@@ -1,0 +1,96 @@
+.product_list {
+    height: 100vh !important;
+}
+
+.product_list_table {
+    overflow-y: hidden;
+    overflow-x: scroll;
+}
+
+.product_summery {
+    border: none !important;
+    background: rgba(108, 117, 125, 0.58) !important;
+    color: white;
+    text-transform: none !important;
+}
+
+.invoice_readonly_field {
+    /*width: 30px !important;*/
+    background: none !important;
+    border: none !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+.invoice_field {
+    padding-right: 0px !important;
+}
+
+.noPadding td {
+    padding: 0px !important;
+}
+
+.noPadding td input {
+    margin: 0px !important;
+}
+
+.divider {
+    margin: auto;
+    margin-top: -25px;
+    margin-bottom: 10px;
+    width: 300px;
+    border: 3px solid green;
+    padding: 10px;
+    border: none;
+    height: 50px;
+    border-bottom: 1px solid #1f1209;
+    box-shadow: 0px 20px 20px -20px #333;
+}
+
+.avoid-clicks {
+    pointer-events: none;
+}
+.customer_info_table span{
+    /*line-height: 2.3;*/
+    box-shadow: inset 1px 2px 8px rgba(0, 0, 0, 0.07);
+    cursor: pointer;
+}
+
+.no_stretch{
+    width:1%;
+    white-space:nowrap;
+    line-height: 3.2;
+}
+.customer_info_table textarea{
+    background: white !important;
+    box-shadow: inset 1px 2px 8px rgba(0, 0, 0, 0.07);
+    padding: 6px 12px;
+    cursor: pointer !important;
+}
+.fade-scale {
+  transform: scale(0);
+  opacity: 0;
+  -webkit-transition: all .25s linear;
+  -o-transition: all .25s linear;
+  transition: all .25s linear;
+}
+
+.fade-scale.in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.form-control{
+    padding: 6px 10px 10px 10px !important;
+}
+
+.navbar .navbar-toggler {
+    height: auto !important;
+}
+
+.navbar-light .navbar-toggler {
+    border-color: transparent !important;
+}
+.navbar-toggler-icon {
+    margin-left: -8px !important;
+}

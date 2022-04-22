@@ -1,0 +1,279 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-11 col-12 text-center text-md-left">
+                            <h5 class="card-title text-center">Supplier ID- {{ supplier_details.id }}</h5>
+                        </div>
+                        {% if form and perms.product.change_supplier %}
+                            <div class="col-md-1 col-12">
+                            <button type="button" class="btn btn-round btn-primary btn-block mr-2 float-md-right"
+                                    data-toggle="modal" data-target="#supplierEditModal" id="edit_btn">
+                                Edit
+                            </button>
+                        {% endif %}
+                        </div>
+                    </div>
+                    <hr style="margin:0px !important;">
+
+                    <div class="card-body">
+                        <div class="row pt-2">
+                            <div class="col-12 col-md-1">
+                                <table class="customer_info_table" style="width: 100%;">
+                                    <tbody>
+                                    <tr>
+                                        <td class="no_stretch"><label>Supplier Name:</label></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 col-md-5">
+                                <table class="customer_info_table" style="width: 100%;">
+                                    <tbody>
+                                    <tr>
+                                        <td><span class="form-control"
+                                                  id="supplier_name_txt">{{ supplier_details.name }}</span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 col-md-1">
+                                <table class="customer_info_table" style="width: 100%;">
+                                    <tbody>
+                                    <tr>
+                                        <td class="no_stretch"><label>Supplier Phone:</label></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 col-md-5">
+                                <table class="customer_info_table" style="width: 100%;">
+                                    <tbody>
+                                    <tr>
+                                        <td><span class="form-control"
+                                                  id="supplier_phone_txt">{{ supplier_details.mobile_no }}</span></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row pt-2">
+                            <div class="col-12 col-md-1">
+                                <table class="customer_info_table" style="width: 100%;">
+                                    <tbody>
+                                    <tr>
+                                        <td class="no_stretch"><label>Supplier Address:</label></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 col-md-11">
+                                <table class="customer_info_table" style="width: 100%;">
+                                    <tbody>
+                                    <tr>
+                                        <td><textarea disabled
+                                                      class="form-control"
+                                                      id="supplier_address_txt">{{ supplier_details.address }}</textarea>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-12 text-center text-md-left">
+                            <h5 class="card-title">Supplying History</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pt-2">
+                        <div class="col-12">
+                            <div class="table-responsive table_outside_border">
+                                <table class="table table-hover" id="product_list">
+                                    <thead class="text-primary">
+                                    <th>Date</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>GSM</th>
+                                    <th>Size</th>
+                                    <th>Color</th>
+                                    <th>Total Supplied</th>
+                                    <th class="text-right">Purchase Price</th>
+                                    <th class="text-right">Total Price</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in supplier_details.product_list %}
+                                        <tr>
+                                            <td>{{ item.date|date:'d/m/Y h:i A' }}</td>
+                                            <td>{{ item.product.product.product_name }}</td>
+                                            <td>{{ item.product.category }}</td>
+                                            <td>{{ item.product.gsm }}</td>
+                                            <td>{{ item.product.size }}</td>
+                                            <td>{{ item.product.color }}</td>
+                                            <td>{{ item.total_supplied }}</td>
+                                            <td class="text-right">{{ item.per_product_purchase_price|floatformat:2 }}</td>
+                                            <td class="text-right">{{ item.total_price|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block outside_wrapper %}
+    {% if perms.product.change_supplier %}
+        <!-- The Modal -->
+        <div class="modal fade" id="supplierEditModal" tabindex="-1" role="dialog"
+             aria-labelledby="supplierEditModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="supplierEditModalLabel">Edit Supplier
+                            info</h5>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.supplier_id }}
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Supplier Name</label>
+                                        {{ form.name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Supplier mobile No
+                                            <span class="error_text"
+                                                  id="mobile_no_error_text"></span>
+                                        </label>
+                                        {{ form.mobile_no }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Supplier Address</label>
+                                        {{ form.address }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--Modal End-->
+    {% endif %}
+
+{% endblock %}
+{% block add_new_js %}
+    <script>
+        $(document).ready(function () {
+            initDatatable();
+            preventAutoFormSubmission();
+            {#checkFieldError();#}
+            /*----------------------*/
+            {% if perms.product.change_supplier %}
+                var name = $(`{{ form.name }}`).val();
+                var mobileNo = $(`{{ form.mobile_no }}`).val();
+                var address = $(`{{ form.address }}`).val();
+                $('#edit_btn').on('click', function () {
+                    $('#fullname').val(name);
+                    $('#id_mobile_no').val(mobileNo);
+                    $('#id_address').val(address);
+                    $('#mobile_no_error_text').text('');
+                    $('#id_mobile_no').removeClass('error_border');
+                });
+
+                $("form").bind("submit", function (e) {
+                    e.preventDefault();
+                    if ($('#id_mobile_no').val() == mobileNo) {
+                        $('#supplierId').val(1);
+                    }
+                    var data = $(this).serialize();
+                    $('#spinner').removeClass('display-none');
+                    $('#save_btn_txt').addClass('display-none');
+                    $.ajax({
+                        url: window.location.href,
+                        type: 'POST',
+                        data: data,
+                        success: function (data, textStatus, jqXHR) {
+                            showToast('Supplier info has been updated', 'success');
+                            $('#supplierId').val(0);
+                            $('#spinner').addClass('display-none');
+                            $('#save_btn_txt').removeClass('display-none');
+                            $('#mobile_no_error_text').text('');
+                            $('#id_mobile_no').removeClass('error_border');
+                            $('#supplierEditModal').modal('hide');
+
+                            name = $('#fullname').val();
+                            mobileNo = $('#id_mobile_no').val();
+                            address = $('#id_address').val();
+                            $('#supplier_name_txt').text(name);
+                            $('#supplier_phone_txt').text(mobileNo);
+                            $('#supplier_address_txt').val(address);
+                        },
+                        error: function (data, textStatus, jqXHR) {
+                            $('#supplierId').val(0);
+                            $('#spinner').addClass('display-none');
+                            $('#save_btn_txt').removeClass('display-none');
+                            var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                            if ('permission_denied' in errors) {
+                                showToast(errors.permission_denied, 'error');
+                            } else {
+                                showToast('Error occurred while updating supplier', 'error');
+                            }
+                            if (errors.mobile_no) {
+                                $('#mobile_no_error_text').text(errors.mobile_no[0]);
+                                $('#id_mobile_no').addClass('error_border');
+                            } else {
+                                $('#mobile_no_error_text').text('');
+                                $('#id_mobile_no').removeClass('error_border');
+                            }
+                        }
+                    });
+                });
+            {% endif %}
+        });
+
+    </script>
+{% endblock %}
+

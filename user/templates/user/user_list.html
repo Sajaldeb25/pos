@@ -1,0 +1,67 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row product_list">
+        <div class="col col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title text-center text-md-left"> All employees </h4>
+                </div>
+                <hr/>
+                <div class="card-body">
+                    <div class="table-responsive product_list_table">
+                        <table class="table table-hover" id="product_list">
+                            <thead class=" text-primary">
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Phone1</th>
+                            <th>Phone2</th>
+                            <th>Position</th>
+                            <th>Total taken order</th>
+                            <th>Last Login</th>
+                            </thead>
+                            <tbody>
+                            {% for user in users %}
+                                <tr class="cursor-pointer" onclick="redirect_new_page('{% url 'user:user_details' user.code %}')">
+                                    <td>{{ user.code }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.gender }}</td>
+                                    <td>{{ user.phone_no1 }}</td>
+                                    <td>{{ user.phone_no2 }}</td>
+                                    {% if user.is_superuser %}
+                                        <td>Super Admin</td>
+                                        {% elif user.is_admin %}
+                                            <td>Admin</td>
+                                        {% elif user.is_seller %}
+                                            <td>Seller</td>
+                                        {% else %}
+                                            <td>Not set</td>
+                                    {% endif %}
+                                    <td>{{ user.order_sold_by.count}}</td>
+                                    <td>{{ user.last_login|date:'d/m/Y h:i A' }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% csrf_token %}
+{% endblock %}
+{% block outside_wrapper %}
+
+{% endblock %}
+{% block add_new_js %}
+    <script src="{% static  '/product/js/ajax_request.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            initDatatable();
+            preventAutoFormSubmission();
+            /*------------*/
+        });
+    </script>
+{% endblock %}

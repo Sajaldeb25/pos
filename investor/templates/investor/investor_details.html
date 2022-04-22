@@ -1,0 +1,520 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block outside_wrapper %}
+    {% if perms.investor.delete_investhistory %}
+        <ul class="ContextMenu ContextMenu--theme-default" id="contextMenu" data-contextmenu="0" tabindex="-1">
+            <li class="ContextMenu-item" tabindex="0" id="deleteBtn"
+                onclick="confirmRelease()" data-total-variant="0" data-id data-delete-row>
+                <i class="fa fa-minus-circle context-menu-icon"></i>
+                <strong style="margin-left: 20px;">Release</strong>
+            </li>
+        </ul>
+    {% endif %}
+    {% if perms.investor.view_investhistory %}
+        <!-- Invest history month Modal -->
+        <div class="modal fade" id="investHisMonthModal" tabindex="-1" role="dialog"
+             aria-labelledby="investHisMonthModalLabbel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="investHisMonthModalLabel">Profit for Per Invest</h5>
+                    </div>
+                    <div class="display-none" id="newStockErrorBlock" style="padding-top: 10px;">
+                        <hr style="margin: 0px !important;">
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-responsive table_outside_border">
+                                    <table class="table table-hover">
+                                        <thead class="text-primary">
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Profit</th>
+                                        <th>Profit(%)</th>
+                                        </thead>
+                                        <tbody id="perInvestProfit">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Invest history month End-->
+    {% endif %}
+    {% if perms.investor.add_investhistory %}
+        <!-- New invest Modal -->
+        <div class="modal fade" id="newInvestModal" tabindex="-1" role="dialog"
+             aria-labelledby="newInvestModalLabbel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newInvestModalLabel">Add New Invest</h5>
+                    </div>
+                    <div class="display-none" id="newStockErrorBlock" style="padding-top: 10px;">
+                        <hr style="margin: 0px !important;">
+                    </div>
+                    <form method="post" id="newInvestForm">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            New Invest
+                                        </label>
+                                        {{ invest_form.amount }}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-round"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-round"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--New Invest End-->
+    {% endif %}
+
+    {% if perms.investor.change_shareholder %}
+        <!-- The Product edit Modal -->
+        <div class="modal fade" id="investorEditModal" tabindex="-1" role="dialog"
+             aria-labelledby="investeroEditModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="supplierEditModalLabel">Edit Shareholder
+                            info</h5>
+                    </div>
+                    <form method="post" id="investorForm">
+                        {% csrf_token %}
+                        <input type="number" hidden name="id" value="{{ investor_details.id }}">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Name
+                                            <span class="error_text" id="investorNameErrorTxt"></span>
+                                        </label>
+                                        {{ investor_form.name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Phone No
+                                            <span class="error_text" id="investorPhoneErrorTxt"></span>
+                                        </label>
+                                        {{ investor_form.phone_no }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Address</label>
+                                        {{ investor_form.address }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-round"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-round"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--The Product edit End-->
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-12 col-md-8">
+                    <!--Product Info -->
+                    <div class="card card-user">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-10 col-12 text-center text-md-left">
+                                    <h5 class="card-title">Shareholder no- {{ investor_details.id }}</h5>
+                                </div>
+                                {% if investor_form and perms.investor.change_shareholder %}
+                                    <div class="col-md-2 col-12">
+                                        <button type="button" class="btn btn-round min-width-120 btn-primary mr-2 float-md-right"
+                                                data-toggle="modal" data-target="#investorEditModal"
+                                                id="investorEditBtn">
+                                            Edit
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <hr style="margin:0px !important;">
+                        </div>
+                        <!--card header end -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input type="text" disabled class="form-control input-text"
+                                               id="nameTxt" value="{{ investor_details.name }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="phone_no">Phone no</label>
+                                        <input type="text" disabled class="form-control input-text"
+                                               id="phoneNoTxt" value="{{ investor_details.phone_no }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="address">Address</label>
+                                        <textarea type="text" disabled class="form-control input-text"
+                                                  id="addressTxt">{{ investor_details.address }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!--Investor Info end -->
+                </div>
+                <div class="col-md-4 col-12">
+                    <!--Profit Info -->
+                    <div class="card card-user">
+                        <!--card header end -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <ul class="list-group">
+                                        <li class="list-group-item">Total Earned: <span
+                                                id="totalOrderTxt">{{ investor_details.total_earning|floatformat:2 }}</span>
+                                        </li>
+                                        <li class="list-group-item">Latest earning: <span
+                                                id="totalItemTxt">{{ investor_details.latest_profit|floatformat:2 }}</span>
+                                        </li>
+                                        <li class="list-group-item">Latest Profit(%): <span
+                                                id="totalBilledTxt">{{ investor_details.latest_profit_percent|floatformat:2 }}%</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Product Info end -->
+                </div>
+            </div>
+            <!--Invests-->
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-10 col-12 text-center text-md-left">
+                            <h5 class="card-title">Invests</h5>
+                        </div>
+                        {% if invest_form and perms.investor.add_investhistory %}
+                            <div class="col-md-2 col-12">
+                                <button type="button" class="btn btn-round min-width-120 btn-primary mr-2 float-md-right"
+                                        data-toggle="modal" data-target="#newInvestModal" id="newInvestBtn">
+                                    Add
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pt-2">
+                        <div class="col-12">
+                            <div class="table-responsive table_outside_border">
+                                <table class="table table-hover" id="product_list">
+                                    <thead class="text-primary">
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in investor_details.invest_history %}
+                                        <tr class="investRow cursor-pointer" data-id="{{ item.id }}">
+                                            <td>{{ item.date|date:'d/m/Y h:i A' }}</td>
+                                            <td>{{ item.amount|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Invests End-->
+            <!--Profit history-->
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-12 text-center text-md-left">
+                            <h5 class="card-title">Profit History</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pt-2">
+                        <div class="col-12">
+                            <div class="table-responsive table_outside_border">
+                                <table class="table table-hover" id="profitHistoryTable">
+                                    <thead class="text-primary">
+                                    <th>Month'Year</th>
+                                    <th class="text-right">Revenue</th>
+                                    <th class="text-right">Net Profit</th>
+                                    <th class="text-right">Shareholder Loss/Profit</th>
+                                    <th class="text-right">Shareholder Loss/Profit(%)</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in profit_details %}
+                                        <tr onclick="showInvestHistoryMonth({{ item.invest_history }})"
+                                            class="cursor-pointer">
+                                            <td>{{ item.order__ordered_date__month|month_name }}'{{ item.order__ordered_date__year }}</td>
+                                            <td class="text-right">{{ item.net_revenue|floatformat:2 }}</td>
+                                            <td class="text-right">{{ item.net_profit|floatformat:2 }}</td>
+                                            {% if item.this_month_profit %}
+                                                <td class="text-right">{{ item.this_month_profit|floatformat:2 }}</td>
+                                                <td class="text-right">{{ item.this_month_profit_percent|floatformat:2 }}%</td>
+                                            {% else %}
+                                                <td class="text-right">0.0</td>
+                                                <td class="text-right">0%</td>
+                                            {% endif %}
+
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Profit History End-->
+        </div>
+    </div>
+    {% block add_new_js %}
+        <script src="{% static 'product/js/ajax_request.js' %}"></script>
+        <script>
+            /*-------------*/
+            function showSpinner() {
+                $('#spinner').removeClass('display-none');
+                $('#save_btn_txt').addClass('display-none');
+            }
+
+            function hideSpinner() {
+                $('#spinner').addClass('display-none');
+                $('#save_btn_txt').removeClass('display-none');
+            }
+
+            /*---------*/
+            function initErrorText() {
+                $('#investorPhoneErrorTxt').text('');
+                $('input[name="phone_no"]').removeClass('error_border');
+            }
+
+            /*-----------------Product edit and error function----------*/
+            function investorEditSuccess(data, textStatus, jqXHR) {
+                hideSpinner();
+                initErrorText();
+                showToast('Investor info has been updated', 'success');
+                window.name = $('input[name="name"]').val();
+                window.phoneNo = $('input[name="phone_no"]').val();
+                window.addresss = $('textarea[name="address"]').val();
+                $('#nameTxt').val(window.name);
+                $('#phoneNoTxt').val(window.phoneNo);
+                $('#addressTxt').val(window.address);
+                $('#investorEditModal').modal('hide');
+            }
+
+            function investorEditError(data, textStatus, jqXHR) {
+                hideSpinner();
+                var errors = data.responseJSON;
+                initErrorText();
+                if ('permission_denied' in errors) {
+                    showToast(errors.permission_denied, 'error');
+                } else {
+                    showToast('Error occurred while updating investor', 'error');
+                }
+                if ('investor_error' in errors) {
+                    if ('phone_no' in errors.investor_error && errors.investor_error.phone_no) {
+                        $('#investorPhoneErrorTxt').text(errors.investor_error.phone_no[0]);
+                        $('input[name="phone_no"]').addClass('error_border');
+                    }
+                }
+            }
+
+            function newInvestSuccess(data, textStatus, jqXHR) {
+                hideSpinner();
+                //{order: [[1, "desc"]]}
+                var dataTable = $('#product_list').DataTable();
+                console.log(data);
+                var newNode = dataTable.row.add([data.date, data.amount]).draw().node();
+                $(newNode).addClass('investRow cursor-pointer');
+                $(newNode).attr('data-id', data.id);
+                showToast('Invest amount has been added', 'success');
+                $('#newInvestModal').modal('hide');
+            }
+
+            function newInvestError(data, textStatus, jqXHR) {
+                hideSpinner();
+                var errors = data.responseJSON;
+                if ('permission_denied' in errors) {
+                    showToast(errors.permission_denied, 'error');
+                    errors = [{'error': ''}, {'error2': ''}];
+                } else {
+                    showToast('Error occurred while adding invest', 'error');
+                }
+            }
+
+            {% if perms.investor.delete_investhistory %}
+                function investListContextMenu() {
+                    $('.investRow').on('contextmenu', function (e) {
+                        e.preventDefault();
+                        $('#contextMenu').css({
+                            top: e.pageY + 'px',
+                            left: e.pageX + 'px'
+                        }).addClass('is-open');
+                        var id = $(this).data('id');
+                        $('#deleteBtn').data('id', id);
+                        $('#deleteBtn').data('deleteRow', this);
+                    })
+                }
+
+                function confirmRelease() {
+                    var action = confirm('Do you sure to release the share?');
+                    if (action) {
+                        releaseInvest();
+                    }
+                }
+
+                function releaseInvest() {
+                    var id = $('#deleteBtn').data('id');
+                    var deleteRow = $('#deleteBtn').data('deleteRow');
+                    var dataTable = $('#product_list').DataTable();
+                    $.ajax({
+                        url: window.location.href,
+                        type: 'POST',
+                        data: {
+                            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                            dlt_id: id,
+                        },
+                        success: function (data, textStatus, jqXHR) {
+                            dataTable.row($(deleteRow)).remove().draw();
+                            showToast('Successfully released', 'success');
+                        },
+                        error: function (data, textStatus, jqXHR) {
+                            showToast('Error occurred while releasing', 'error');
+                        }
+                    });
+                }
+            {% endif %}
+
+            function showInvestHistoryMonth(investHistories) {
+                if (!investHistories) {
+                    showToast("No history found", "error");
+                    return;
+                }
+                $('#perInvestProfit').html('');
+                for (item of investHistories) {
+                    html = `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td>${item.amount}</td>
+                        <td>${parseFloat(item.profit).toFixed(2)}</td>
+                        <td>${parseFloat(item.profit_percent).toFixed(2)}%</td>
+                    </tr>
+                    `;
+                    $('#perInvestProfit').append(html);
+                }
+                $('#investHisMonthModal').modal('toggle');
+            }
+
+            /*----------------------------------------------------*/
+            $(document).ready(function () {
+                initDatatable();
+                initDatatable('#profitHistoryTable');
+                preventAutoFormSubmission();
+                {% if perms.investor.delete_investhistory %}
+                    investListContextMenu();
+                    $(document).click(function () {
+                        $('#contextMenu').removeClass('is-open');
+                    });
+                {% endif %}
+                window.name = $(`{{ investor_form.name }}`).val();
+                window.phoneNo = $(`{{ investor_form.phone_no }}`).val();
+                window.address = $(`{{ variant_form.address }}`).val();
+
+                /*---------Product edit form action--------------*/
+                $('#investorEditBtn').on('click', function () {
+                    $('input[name="name"]').val(window.name);
+                    $('input[name="phone_no"]').val(window.phoneNo);
+                    $('textarea[name="address"]').val(window.address);
+                    initErrorText();
+                });
+
+                $("#investorForm").bind("submit", function (e) {
+                    e.preventDefault();
+                    var data = $(this).serialize();
+                    showSpinner();
+                    ajaxRequest(data, 'investorEdit')
+
+                });
+                /*---------Product edit form action End--------------*/
+                $('#newInvestBtn').on('click', function () {
+                    $('input[name="amount"]').val('');
+                });
+
+                $("#newInvestForm").bind("submit", function (e) {
+                    e.preventDefault();
+                    var data = $(this).serialize() + '&id={{ investor_details.id }}';
+                    showSpinner();
+                    ajaxRequest(data, 'newInvest')
+
+                });
+                /*---------------*/
+            });
+        </script>
+    {% endblock %}
+{% endblock %}
+

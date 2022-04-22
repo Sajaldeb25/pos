@@ -1,0 +1,122 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row product_list">
+        <div class="col col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title text-center text-md-left"> All products </h4>
+                </div>
+                <hr/>
+                <div class="card-body">
+                    <div class="table-responsive product_list_table">
+                        <table class="table table-hover" id="product_list">
+                            <thead class=" text-primary">
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Total Variant</th>
+                            <th>Total Stock</th>
+                            </thead>
+                            <tbody>
+                            {% for product in product_list %}
+                                <tr class="product_row cursor-pointer"
+                                    onclick="redirect_new_page('{% url 'product:product_details' product.id %}')"
+                                    data-product-id='{{ product.id }}'
+                                    data-total-variant="{{ product.product_variant|length }}">
+                                    <td>{{ product.id }}</td>
+                                    <td>{{ product.product_name }}</td>
+                                    <td>{{ product.product_variant|length }}</td>
+                                    <td>{{ product.total_stock }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% csrf_token %}
+{% endblock %}
+{% block outside_wrapper %}
+    {% if perms.product.delete_product %}
+        <ul class="ContextMenu ContextMenu--theme-default" id="contextMenu" data-contextmenu="0" tabindex="-1">
+            <li class="ContextMenu-item" tabindex="0" id="deleteBtn"
+                onclick="confirmDelete()" data-total-variant="0" data-product-id data-delete-row>
+                <i class="fa fa-minus-circle context-menu-icon"></i>
+                <strong style="margin-left: 20px;">Delete</strong>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+{% block add_new_js %}
+    <script>
+        {% if perms.product.delete_product %}
+            function productListContextMenu() {
+                $('.product_row').on('contextmenu', function (e) {
+                    e.preventDefault();
+                    $('#contextMenu').css({
+                        top: e.pageY + 'px',
+                        left: e.pageX + 'px'
+                    }).addClass('is-open');
+                    var totalVariant = $(this).data('totalVariant');
+                    var productId = $(this).data('productId');
+                    $('#deleteBtn').data('totalVariant', totalVariant);
+                    $('#deleteBtn').data('productId', productId);
+                    $('#deleteBtn').data('deleteRow', this);
+                })
+            }
+
+            function deleteProductItem() {
+                var id = $('#deleteBtn').data('productId');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var dataTable = $('#product_list').DataTable();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                        product_id: id
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        dataTable.row($(deleteRow)).remove().draw();
+                        showToast('Product has been deleted', 'success');
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        var errors = data.responseJSON ? data.responseJSON : [{'error': ''}];
+                        if ('permission_denied' in errors) {
+                            showToast(errors.permission_denied, 'error');
+                        } else {
+                            showToast('Error occurred while deleting product', 'error');
+                        }
+                    }
+                });
+            }
+
+            function confirmDelete() {
+                var totalVariant = $('#deleteBtn').data('totalVariant');
+                totalVariant > 1 ? totalVariant = totalVariant + " variants" : totalVariant = totalVariant + " variant";
+                var action = confirm("Do yo really want to delete this product? Then " + totalVariant + " and associated transactions will be deleted.");
+                if (action) {
+                    deleteProductItem();
+                }
+
+            }
+        {% endif %}
+
+        $(document).ready(function () {
+            initDatatable();
+            //preventAutoFormSubmission();
+            /*----------------------*/
+            {% if perms.product.delete_product %}
+                productListContextMenu();
+                $(document).click(function () {
+                    $('#contextMenu').removeClass('is-open');
+                });
+            {% endif %}
+
+        });
+    </script>
+{% endblock %}
+

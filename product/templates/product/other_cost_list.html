@@ -1,0 +1,340 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row product_list">
+        <div class="col col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-10 col-12 text-center text-md-left">
+                            <h5 class="card-title">Other costs</h5>
+                        </div>
+                        {% if form and perms.product.add_othercost %}
+                            <div class="col-md-2 col-12 text-center">
+                                <button type="button"
+                                        class="btn btn-round min-width-120 btn-primary mr-2 float-md-right"
+                                        data-toggle="modal" data-target="#formModal" id="addBtn">
+                                    Add
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <hr style="margin:0px !important;">
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive product_list_table">
+                        <table class="table table-hover" id="product_list">
+                            <thead class=" text-primary">
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Shop rent</th>
+                            <th>Per product shop rent cost</th>
+                            <th>Electricity bill</th>
+                            <th>Per product electricity cost</th>
+                            <th>Employee cost</th>
+                            <th>Per product employee cost</th>
+                            <th>Other Cost</th>
+                            <th>Per product other cost</th>
+                            </thead>
+                            <tbody>
+                            {% for other_cost in other_cost_list %}
+                                <tr class="other_cost_row cursor-pointer" data-id='{{ other_cost.id }}'>
+                                    <td>{{ other_cost.id }}</td>
+                                    <td>{{ other_cost.date|date:'d/m/Y' }}</td>
+                                    <td>{{ other_cost.shop_rent|floatformat:2 }}</td>
+                                    <td>{{ other_cost.shop_rent_per_product|floatformat:2 }}</td>
+                                    <td>{{ other_cost.electricity_bill|floatformat:2 }}</td>
+                                    <td>{{ other_cost.electricity_bill_per_product|floatformat:2 }}</td>
+                                    <td>{{ other_cost.employee_cost|floatformat:2 }}</td>
+                                    <td>{{ other_cost.employee_cost_per_product|floatformat:2 }}</td>
+                                    <td>{{ other_cost.others_bill|floatformat:2 }}</td>
+                                    <td>{{ other_cost.others_bill_per_product|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% csrf_token %}
+{% endblock %}
+{% block outside_wrapper %}
+    {% if perms.product.add_othercost or perms.product.change_othercost %}
+        <div class="modal fade" id="formModal" tabindex="-1" role="dialog"
+             aria-labelledby="formModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="formModalLabel"></h5>
+                    </div>
+                    <form method="post" id="form" data-edit="0">
+                        {% csrf_token %}
+                        <input type="number" name="id" hidden id="idInput">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Shop rent
+                                            <span class="error_text" id="shopRentErrorTxt"></span>
+                                        </label>
+                                        {{ form.shop_rent }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Per product shop rent
+                                            <span class="error_text" id="shopRentPerProductErrorTxt"></span>
+                                        </label>
+                                        {{ form.shop_rent_per_product }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Electricity Bill
+                                            <span class="error_text" id="electricityBillErrorTxt"></span>
+                                        </label>
+                                        {{ form.electricity_bill }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Per product electricity bill
+                                            <span class="error_text" id="electricityBillPerProductErrorTxt"></span>
+                                        </label>
+                                        {{ form.electricity_bill_per_product }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Employee cost
+                                            <span class="error_text" id="employeeCostErrorTxt"></span>
+                                        </label>
+                                        {{ form.employee_cost }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Per product employee cost
+                                            <span class="error_text" id="employeeCostPerProductTxt"></span>
+                                        </label>
+                                        {{ form.employee_cost_per_product }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Others
+                                            <span class="error_text" id="othersErrorTxt"></span>
+                                        </label>
+                                        {{ form.others_bill }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Per product others bill
+                                            <span class="error_text" id="othersPerProductErrorTxt"></span>
+                                        </label>
+                                        {{ form.others_bill_per_product }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if perms.product.delete_othercost or perms.product.change_othercost %}
+        <ul class="ContextMenu ContextMenu--theme-default" id="contextMenu" data-contextmenu="0" tabindex="-1">
+            {% if perms.product.delete_othercost %}
+                <li class="ContextMenu-item" tabindex="0" id="deleteBtn"
+                    onclick="confirmDelete()" data-total-variant="0" data-id data-delete-row>
+                    <i class="fa fa-minus-circle context-menu-icon"></i>
+                    <strong style="margin-left: 20px;">Delete</strong>
+                </li>
+            {% endif %}
+            {% if perms.product.change_othercost %}
+                <li class="ContextMenu-item" tabindex="0" id="editBtn"
+                    data-toggle="modal" data-target="#formModal" data-edit-row>
+                    <i class="fa fa-edit context-menu-icon" style="color: green !important;"></i>
+                    <strong style="margin-left: 20px;">Edit</strong>
+                </li>
+            {% endif %}
+        </ul>
+    {% endif %}
+{% endblock %}
+{% block add_new_js %}
+    <script>
+        {% if perms.product.add_othercost or perms.product.change_othercost %}
+            function showSpinner() {
+                $('#spinner').removeClass('display-none');
+                $('#save_btn_txt').addClass('display-none');
+            }
+
+            function hideSpinner() {
+                $('#spinner').addClass('display-none');
+                $('#save_btn_txt').removeClass('display-none');
+            }
+
+            function submitForm() {
+                $('#form').on('submit', function (e) {
+                    if ($('#form').data('edit') != '0') {
+                        e.preventDefault();
+                        showSpinner();
+                        var row = $('#editBtn').data('editRow');
+                        var tds = $(row).find('td');
+                        var id = $(tds[0]).text();
+                        $.ajax({
+                            url: window.location.href,
+                            type: 'POST',
+                            data: $('#form').serialize() + `&id=${id}`,
+                            success: function (data, textStatus, jqXHR) {
+                                showToast('Successfully edited', 'success');
+                                hideSpinner();
+                                $(tds[2]).text('45');
+                                $(tds[2]).text($('#shopRentInput').val());
+                                $(tds[3]).text($('#shopRentPerProductInput').val());
+                                $(tds[4]).text($('#electricityBillInput').val());
+                                $(tds[5]).text($('#electricityBillPerProductInput').val());
+                                $(tds[6]).text($('#employeeCostInput').val());
+                                $(tds[7]).text($('#employeeCostPerProductInput').val());
+                                $(tds[8]).text($('#otherBillInput').val());
+                                $(tds[9]).text($('#otherBillPerProductInput').val());
+                                $('#formModal').modal('toggle');
+                            },
+                            error: function (data, textStatus, jqXHR) {
+                                var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                                if ('permission_denied' in errors) {
+                                    showToast(errors.permission_denied, 'error');
+                                } else {
+                                   showToast('Error occurred while updating', 'error');
+                                }
+                                hideSpinner();
+                            }
+                        });
+                    }
+                })
+            }
+        {% endif %}
+
+        {% if perms.product.add_othercost %}
+            function initAddForm() {
+                $('#addBtn').on('click', function () {
+                    $('#formModalLabel').text('Add new utility bill');
+                    $('#form').data('edit', '0');
+                });
+            }
+        {% endif %}
+        {% if perms.product.change_othercost %}
+            function initEditForm() {
+                $('#editBtn').on('click', function () {
+                    $('#formModalLabel').text('Edit utility bill');
+                    $('#form').data('edit', '1');
+                    var row = $(this).data('editRow');
+                    var tds = $(row).find('td');
+                    $('#shopRentInput').val($(tds[2]).text());
+                    $('#shopRentPerProductInput').val($(tds[3]).text());
+                    $('#electricityBillInput').val($(tds[4]).text());
+                    $('#electricityBillPerProductInput').val($(tds[5]).text());
+                    $('#employeeCostInput').val($(tds[6]).text());
+                    $('#employeeCostPerProductInput').val($(tds[7]).text());
+                    $('#otherBillInput').val($(tds[8]).text());
+                    $('#otherBillPerProductInput').val($(tds[9]).text());
+                });
+            }
+        {% endif %}
+
+        {% if perms.product.delete_othercost or perms.product.change_othercost %}
+            function otherListContextMenu() {
+                $('.other_cost_row').on('contextmenu', function (e) {
+                    e.preventDefault();
+                    $('#contextMenu').css({
+                        top: e.pageY + 'px',
+                        left: e.pageX + 'px'
+                    }).addClass('is-open');
+                    var id = $(this).data('id');
+                    $('#deleteBtn').data('id', id);
+                    $('#deleteBtn').data('deleteRow', this);
+                    $('#editBtn').data('editRow', this);
+                })
+            }
+        {% endif %}
+        {% if perms.product.delete_othercost %}
+            function deleteUtilityBill() {
+                var id = $('#deleteBtn').data('id');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var dataTable = $('#product_list').DataTable();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                        utility_bill_dlt_id: id
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        dataTable.row($(deleteRow)).remove().draw();
+                        showToast('Successfully deleted', 'success');
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                        if ('permission_denied' in errors) {
+                            showToast(errors.permission_denied, 'error');
+                        } else {
+                            showToast('Error occurred while deleting', 'error');
+                        }
+                    }
+                });
+            }
+
+            function confirmDelete() {
+                var action = confirm('Do you sure to delete this utility bill?');
+                if (action) {
+                    deleteUtilityBill();
+                }
+            }
+        {% endif %}
+        $(document).ready(function () {
+            initDatatable();
+            preventAutoFormSubmission();
+            {% if perms.product.add_othercost %}
+                initAddForm();
+            {% endif %}
+            {% if perms.product.change_othercost %}
+                initEditForm();
+            {% endif %}
+            {% if perms.product.change_othercost or perms.product.add_othercost %}
+                submitForm();
+                /*----------------------*/
+                otherListContextMenu();
+                $(document).click(function () {
+                    $('#contextMenu').removeClass('is-open');
+                });
+            {% endif %}
+        });
+    </script>
+{% endblock %}
+

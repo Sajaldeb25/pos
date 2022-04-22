@@ -1,0 +1,490 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-globe text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total Inventory</p>
+                                <p class="card-title">{{ net_stock }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-cart-simple text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total Order</p>
+                                <p class="card-title">{{ net_order }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-cart-simple text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total Paid order</p>
+                                <p class="card-title">{{ full_paid_order }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-cart-simple text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total semi paid order</p>
+                                <p class="card-title">{{ semi_paid_order }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-cart-simple text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total sold item</p>
+                                <p class="card-title">{{ net_sold_item }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-money-coins text-success"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Net Revenue</p>
+                                <p class="card-title">{{ net_revenue|floatformat:2 }} BDT
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-money-coins text-success"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Selling Cost</p>
+                                <p class="card-title">{{ sell_cost|floatformat:2 }} BDT
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-money-coins text-success"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Net Profit</p>
+                                <p class="card-title">{{ net_profit|floatformat:2 }} BDT
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-money-coins text-success"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total Due</p>
+                                <p class="card-title">{{ total_due|floatformat:2 }} BDT
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-chart">
+                <div class="card-header text-center">
+                    <div class="row">
+                        <div class="col-12 col-md-10">
+                            <h5 class="card-title" id="currentMonthStcsLabel"></h5>
+                        </div>
+                        <div class="col-12 col-md-2 text-md-center">
+                            <button class="btn btn-primary dropdown-toggle" type="button"
+                                    id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Revenue
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+                                 style="border: 1px solid gray;">
+                                <a class="dropdown-item cursor-pointer" id="revenueBtn">Revenue</a>
+                                <a class="dropdown-item cursor-pointer" id="profitBtn">Profit</a>
+                                <a class="dropdown-item cursor-pointer" id="orderBtn">Order</a>
+                                <a class="dropdown-item cursor-pointer" id="soldBtn">Sold Item</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<p class="card-category"></p>-->
+                </div>
+                <hr/>
+                <div class="card-body">
+                    <canvas id="currentMonthChart" width="300" height="100"></canvas>
+                </div>
+                <div class="card-footer">
+                    <hr/>
+                    <div class="chart-legend">
+                        <i class="fa fa-circle text-warning"></i>Revenue
+                        <i class="fa fa-circle text-info"></i>Profit
+                        <i class="fa fa-circle" style="color: #003f5c"></i>Order
+                        <i class="fa fa-circle" style="color: #bc5090"></i>Sold Item
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row product_list">
+        <div class="col col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title text-center text-md-left"> All Statistics </h4>
+                </div>
+                <hr/>
+                <div class="card-body">
+                    <div class="table-responsive product_list_table">
+                        <table class="table table-hover" id="product_list">
+                            <thead class=" text-primary">
+                            <th>Month'Year</th>
+                            <th>Total Item</th>
+                            <th class="text-right">Net Revenue</th>
+                            <th class="text-right">Total Selling cost</th>
+                            <th class="text-right">Net Profit</th>
+                            </thead>
+                            <tbody>
+                            {% for item in all_year_month_statistics %}
+                                <tr>
+                                    <td>{{ item.order__ordered_date__month|month_name }}'{{ item.order__ordered_date__year }}</td>
+                                    <td>{{ item.total_item }}</td>
+                                    <td class="text-right">{{ item.net_revenue|floatformat:2 }}</td>
+                                    <td class="text-right">{{ item.net_revenue|substract:item.net_profit|floatformat:2 }}</td>
+                                    <td class="text-right">{{ item.net_profit|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block add_new_js %}
+    <script>
+        var monthList = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        function initLineChart(canvas, chartData, chartOptions) {
+            return new Chart(canvas, {
+                type: 'line',
+                hover: true,
+                data: chartData,
+                options: chartOptions
+            });
+        }
+
+        function initCurrentMonthChart() {
+            var currentMonthStcsCanvas = document.getElementById("currentMonthChart");
+            var netProfit = [];
+            var netRevenue = [];
+            var netSold = [];
+            var netOrder = [];
+            var today = new Date();
+            $('#currentMonthStcsLabel').text(`${monthList[today.getMonth()]}'${today.getFullYear()}`);
+            var currentDate = new Date();
+            var list = [];
+            for (let i = 1; i <= currentDate.getDate(); i++) {
+                list.push(`Day-${i}`);
+            }
+
+            {% for item in current_month_revenue_profit %}
+                var profit = parseFloat('{{item.net_profit}}').toFixed(2);
+                var revenue = parseFloat('{{item.net_revenue}}').toFixed(2);
+                var totalItem = parseInt('{{item.total_item}}');
+                var totalOrder = parseInt('{{ item.order }}');
+                netProfit.push(profit);
+                netRevenue.push(revenue);
+                netSold.push(totalItem);
+                netOrder.push(totalOrder);
+            {% endfor %}
+            var dataFirst = {
+                data: netRevenue,
+                fill: false,
+                borderColor: '#fbc658',
+                backgroundColor: 'transparent',
+                pointBorderColor: '#fbc658',
+                pointRadius: 4,
+                pointHoverRadius: 4,
+                pointBorderWidth: 8,
+            };
+
+            var dataSecond = {
+                data: netProfit,
+                fill: false,
+                borderColor: '#51CACF',
+                backgroundColor: 'transparent',
+                pointBorderColor: '#51CACF',
+                pointRadius: 4,
+                pointHoverRadius: 4,
+                pointBorderWidth: 8
+            };
+            var dataThird = {
+                data: netSold,
+                fill: false,
+                borderColor: '#bc5090',
+                backgroundColor: 'transparent',
+                pointBorderColor: '#bc5090',
+                pointRadius: 4,
+                pointHoverRadius: 4,
+                pointBorderWidth: 8
+            };
+            var dataFourth = {
+                data: netOrder,
+                fill: false,
+                borderColor: '#003f5c',
+                backgroundColor: 'transparent',
+                pointBorderColor: '#003f5c',
+                pointRadius: 4,
+                pointHoverRadius: 4,
+                pointBorderWidth: 8
+            };
+
+            var currentMonthStcData = {
+                labels: list,
+                datasets: [dataFirst]
+            };
+
+            var chartOptions = {
+                legend: {
+                    display: false,
+                    position: 'top'
+                },
+                tooltips: {
+                    callbacks: {
+                        afterBody: function (t, d) {
+                            var dropdownTxt = $('#dropdownMenuButton').text();
+                            if (dropdownTxt == 'Revenue') {
+                                return `Profit: ${netProfit[t[0].index]} Order: ${netOrder[t[0].index]}  Sell: ${netSold[t[0].index]}`
+                            } else if (dropdownTxt == 'Profit') {
+                                return `Revenue: ${netRevenue[t[0].index]} Order: ${netOrder[t[0].index]} Sell: ${netSold[t[0].index]}`
+                            } else if (dropdownTxt == 'Order') {
+                                return `Revenue: ${netRevenue[t[0].index]} Profit: ${netProfit[t[0].index]} Sell: ${netSold[t[0].index]}`
+                            }
+                            return `Revenue: ${netRevenue[t[0].index]}  Order: ${netOrder[t[0].index]} Profit: ${netProfit[t[0].index]}`;  // return a string that you wish to append
+                        }
+                    }
+                },
+            };
+
+
+            var lineChart = initLineChart(currentMonthStcsCanvas, currentMonthStcData, chartOptions);
+            $('#revenueBtn').addClass('chart-dropdown-active');
+            $('#dropdownMenuButton').text('Revenue');
+
+            $('#profitBtn').on('click', function () {
+                lineChart.destroy();
+                currentMonthStcData.datasets = [dataSecond];
+                lineChart = initLineChart(currentMonthStcsCanvas, currentMonthStcData, chartOptions);
+                $('#revenueBtn').removeClass('chart-dropdown-active');
+                $('#soldBtn').removeClass('chart-dropdown-active');
+                $('#orderBtn').removeClass('chart-dropdown-active');
+                $('#profitBtn').addClass('chart-dropdown-active');
+                $('#dropdownMenuButton').text('Profit');
+            });
+
+            $('#revenueBtn').on('click', function () {
+                lineChart.destroy();
+                currentMonthStcData.datasets = [dataFirst];
+                lineChart = initLineChart(currentMonthStcsCanvas, currentMonthStcData, chartOptions);
+                $('#revenueBtn').addClass('chart-dropdown-active');
+                $('#soldBtn').removeClass('chart-dropdown-active');
+                $('#profitBtn').removeClass('chart-dropdown-active');
+                $('#orderBtn').removeClass('chart-dropdown-active');
+                $('#dropdownMenuButton').text('Revenue');
+            });
+
+            $('#soldBtn').on('click', function () {
+                lineChart.destroy();
+                currentMonthStcData.datasets = [dataThird];
+                lineChart = initLineChart(currentMonthStcsCanvas, currentMonthStcData, chartOptions);
+                $('#revenueBtn').removeClass('chart-dropdown-active');
+                $('#soldBtn').addClass('chart-dropdown-active');
+                $('#profitBtn').removeClass('chart-dropdown-active');
+                $('#orderBtn').removeClass('chart-dropdown-active');
+                $('#dropdownMenuButton').text('Sold Item');
+            });
+            $('#orderBtn').on('click', function () {
+                lineChart.destroy();
+                currentMonthStcData.datasets = [dataFourth];
+                lineChart = initLineChart(currentMonthStcsCanvas, currentMonthStcData, chartOptions);
+                $('#revenueBtn').removeClass('chart-dropdown-active');
+                $('#soldBtn').removeClass('chart-dropdown-active');
+                $('#profitBtn').removeClass('chart-dropdown-active');
+                $('#orderBtn').addClass('chart-dropdown-active');
+                $('#dropdownMenuButton').text('Order');
+            });
+        }
+
+        $(document).ready(function () {
+            initDatatable();
+            initCurrentMonthChart();
+            /*----------------------*/
+            {% if messages %}
+                {% for message in messages %}
+                    var tags = ``;
+                    {% if message.tags %}
+                        tags = `{{ message.tags }}`;
+                    {% endif %}
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                    var message = `{{ message }}`;
+                    showToast(message, tags)
+                {% endfor %}
+            {% endif %}
+
+        });
+    </script>
+{% endblock %}

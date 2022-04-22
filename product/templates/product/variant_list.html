@@ -1,0 +1,578 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row product_list">
+        <div class="col-12 col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title text-center text-md-left"> All variants </h4>
+                </div>
+                <hr/>
+                <div class="card-body">
+                    <div class="table-responsive product_list_table">
+                        <table class="table table-hover" id="product_list">
+                            <thead class=" text-primary">
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>GSM</th>
+                            <th>Size</th>
+                            <th>Color</th>
+                            <th class="text-right">Price(BDT)</th>
+                            <th class="text-center">Discount(%)</th>
+                            <th class="text-right">Total Stock</th>
+                            </thead>
+                            <tbody>
+                            {% for product in product_list %}
+                                {% for variant in product.product_variant %}
+                                    <tr class="product_row"
+                                        onclick="redirect_new_page('{% url 'product:variant_details' variant.id %}')"
+                                        style="cursor:pointer;" data-variant-order='{{ variant.total_order }}'
+                                        data-variant-id='{{ variant.id }}'>
+                                        <td class="variant_id">{{ variant.id }}</td>
+                                        <td>{{ product.product_name }}</td>
+                                        <td>{{ variant.category }}</td>
+                                        <td>{{ variant.gsm }}</td>
+                                        <td>{{ variant.size }}</td>
+                                        <td>{{ variant.color }}</td>
+                                        <td class="text-right">{{ variant.price|floatformat:2 }}</td>
+                                        <td class="text-center">{{ variant.discount_percent }} <br> <span
+                                                style="font-size: 10px;">Min purchase- {{ variant.discount_min_purchase }}</span>
+                                        </td>
+                                        <td class="text-right">{{ variant.stock_total }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title text-center text-md-left"> All Sizes </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive size_table">
+                                <table class="table table-hover" id="size_list">
+                                    <thead class=" text-primary">
+                                    <th>ID</th>
+                                    <th>Size</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for size in sizes %}
+                                        <tr class="size_row"
+                                            data-size-id='{{ size.id }}'>
+                                            <td>{{ size.id }}</td>
+                                            <td>{{ size.size }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title text-center text-md-left"> All Colors </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive color_table">
+                                <table class="table table-hover" id="color_list">
+                                    <thead class=" text-primary">
+                                    <th>ID</th>
+                                    <th>Color</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for color in colors %}
+                                        <tr class="color_row"
+                                            data-color-id='{{ color.id }}'>
+                                            <td>{{ color.id }}</td>
+                                            <td>{{ color.color }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title text-center text-md-left"> All Categories </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive category_table">
+                                <table class="table table-hover" id="category_list">
+                                    <thead class=" text-primary">
+                                    <th>ID</th>
+                                    <th>Category</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for category in categories %}
+                                        <tr class="category_row"
+                                            data-category-id='{{ category.id }}'>
+                                            <td>{{ category.id }}</td>
+                                            <td>{{ category.category }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% csrf_token %}
+{% endblock %}
+{% block outside_wrapper %}
+    {% if perms.product.change_size and perms.product.change_color and perms.product.change_category %}
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog"
+             aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel"></h5>
+                    </div>
+                    <form method="post" id="editForm">
+                        {% csrf_token %}
+                        <input type="number" name="id" hidden id="idInput">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            <span id="editInputLabel"></span>
+                                            <span class="error_text" id="editInputErrorTxt"></span>
+                                        </label>
+                                        <input type="text" class="form-control" id="editInput">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <ul class="ContextMenu ContextMenu--theme-default" id="contextMenu" data-contextmenu="0" tabindex="-1">
+        <li class="ContextMenu-item" tabindex="0" id="deleteBtn"
+            onclick="confirmDelete()" data-total-order="0" data-variant-id="-1" data-delete-row data-size-id="-1"
+            data-color-id="-1" data-category-id="-1">
+            <i class="fa fa-minus-circle context-menu-icon"></i>
+            <strong style="margin-left: 20px;">Delete</strong>
+        </li>
+        {% if perms.product.change_size and perms.product.change_color and perms.product.change_category %}
+            <li class="ContextMenu-item display-none" tabindex="0" id="editBtn"
+                onclick="initEditModal()" data-size-id="-1"
+                data-color-id="-1" data-category-id="-1" data-row>
+                <i class="fa fa-edit context-menu-icon" style="color: green !important;"></i>
+                <strong style="margin-left: 20px;">Edit</strong>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+{% block add_new_js %}
+    <script>
+        {% if perms.product.change_size and perms.product.change_color and perms.product.change_category %}
+            function showSpinner() {
+                $('#spinner').removeClass('display-none');
+                $('#save_btn_txt').addClass('display-none');
+            }
+
+            function hideSpinner() {
+                $('#spinner').addClass('display-none');
+                $('#save_btn_txt').removeClass('display-none');
+            }
+
+            function initEditModal() {
+                $('#editInputErrorTxt').text('');
+                $('#editInput').removeClass('error_border');
+                var sizeId = $('#editBtn').data('sizeId');
+                var colorId = $('#editBtn').data('colorId');
+                var categoryId = $('#editBtn').data('categoryId');
+                var row = $('#editBtn').data('row');
+                var td = $(row).find('td')[1];
+                if (sizeId != '-1') {
+                    size = $(td).text();
+                    $('#editModalLabel').text('Edit Size');
+                    $('#editInputLabel').text('Size');
+                    $('#editInput').attr('name', 'size');
+                    $('#editInput').val(size);
+                    $('#idInput').val(sizeId);
+                } else if (colorId != '-1') {
+                    color = $(td).text();
+                    $('#editModalLabel').text('Edit Color');
+                    $('#editInputLabel').text('Color');
+                    $('#editInput').attr('name', 'color');
+                    $('#editInput').val(color);
+                    $('#idInput').val(colorId);
+
+                } else if (categoryId != '-1') {
+                    category = $(td).text();
+                    $('#editModalLabel').text('Edit Category');
+                    $('#editInputLabel').text('Category');
+                    $('#editInput').attr('name', 'category');
+                    $('#editInput').val(category);
+                    $('#idInput').val(categoryId);
+
+                }
+                $('#editModal').modal('toggle');
+            }
+
+            $("#editForm").bind("submit", function (e) {
+                e.preventDefault();
+                var sizeId = $('#editBtn').data('sizeId');
+                var colorId = $('#editBtn').data('colorId');
+                var categoryId = $('#editBtn').data('categoryId');
+                var row = $('#editBtn').data('row');
+                var td = $(row).find('td')[1];
+                var data = $('#editForm').serialize();
+                var newData = $('#editInput').val();
+                var oldData = $(td).text();
+                if (newData.toLowerCase() == oldData.toLowerCase()) {
+                    data += '&is_edited=1';
+                } else {
+                    data += '&is_edited=0';
+                }
+                showSpinner();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: data,
+                    success: function (data, textStatus, jqXHR) {
+                        $(td).text($('#editInput').val());
+                        showToast('Successfully edited item', 'success');
+                        var index;
+                        if (sizeId != '-1') {
+                            index = 4;
+                        } else if (colorId != '-1') {
+                            index = 5;
+                        } else if (categoryId != '-1') {
+                            index = 2;
+                        }
+                        $('.product_row').each(function () {
+                            var tds = $(this).find('td');
+                            if ($(tds[index]).text() == oldData) {
+                                $(tds[index]).text(newData);
+                            }
+                        });
+                        hideSpinner();
+                        $('#editModal').modal('toggle');
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                        if ('permission_denied' in errors) {
+                            showToast(errors.permission_denied, 'error');
+                        } else {
+                            showToast('Error editing data', 'error');
+                            var errorMsg = data.responseJSON.error;
+                            $('#editInputErrorTxt').text(errorMsg);
+                            $('#editInput').addClass('error_border');
+                        }
+                        hideSpinner();
+                    }
+                });
+
+            });
+
+        {% endif %}
+
+        {% if perms.product.delete_productvariant %}
+            function productListContextMenu() {
+                $('.product_row').on('contextmenu', function (e) {
+                    e.preventDefault();
+                    $('#deleteBtn').data('colorId', '-1');
+                    $('#deleteBtn').data('sizeId', '-1');
+                    $('#deleteBtn').data('categoryId', '-1');
+                    $('#editBtn').addClass('display-none');
+                    $('#contextMenu').css({
+                        top: e.pageY + 'px',
+                        left: e.pageX + 'px'
+                    }).addClass('is-open');
+                    var totalOrder = $(this).data('variantOrder');
+                    var vairantId = $(this).data('variantId');
+                    $('#deleteBtn').data('totalOrder', totalOrder);
+                    $('#deleteBtn').data('variantId', vairantId);
+                    $('#deleteBtn').data('deleteRow', this);
+                })
+            }
+
+            function deleteProductItem() {
+                var id = $('#deleteBtn').data('variantId');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var dataTable = $('#product_list').DataTable();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                        variant_id: id
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        dataTable.row($(deleteRow)).remove().draw();
+                        showToast('Variant has been deleted', 'success');
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        showToast('Error occurred while deleting variant', 'error');
+                    }
+                });
+            }
+        {% endif %}
+        {% if perms.product.change_size or perms.product.delete_size %}
+            function sizeListContextMenu() {
+                $('.size_row').on('contextmenu', function (e) {
+                    $('#deleteBtn').data('colorId', '-1');
+                    $('#deleteBtn').data('categoryId', '-1');
+                    $('#editBtn').data('colorId', '-1');
+                    $('#editBtn').data('categoryId', '-1');
+                    $('#editBtn').removeClass('display-none');
+                    e.preventDefault();
+                    $('#contextMenu').css({
+                        top: e.pageY + 'px',
+                        left: e.pageX + 'px'
+                    }).addClass('is-open');
+                    var sizeId = $(this).data('sizeId');
+                    $('#deleteBtn').data('sizeId', sizeId);
+                    $('#deleteBtn').data('deleteRow', this);
+                    $('#editBtn').data('sizeId', sizeId);
+                    $('#editBtn').data('row', this);
+                })
+            }
+        {% endif %}
+        {% if perms.product.change_color or perms.product.delete_color %}
+            function colorListContextMenu() {
+                $('.color_row').on('contextmenu', function (e) {
+                    e.preventDefault();
+                    $('#deleteBtn').data('sizeId', '-1');
+                    $('#deleteBtn').data('categoryId', '-1');
+                    $('#editBtn').data('sizeId', '-1');
+                    $('#editBtn').data('categoryId', '-1');
+                    $('#editBtn').removeClass('display-none');
+                    $('#contextMenu').css({
+                        top: e.pageY + 'px',
+                        left: e.pageX + 'px'
+                    }).addClass('is-open');
+                    var colorId = $(this).data('colorId');
+                    $('#deleteBtn').data('colorId', colorId);
+                    $('#deleteBtn').data('deleteRow', this);
+                    $('#editBtn').data('colorId', colorId);
+                    $('#editBtn').data('row', this);
+                })
+            }
+        {% endif %}
+        {% if perms.product.change_category or perms.product.delete_category %}
+            function categoryListContextMenu() {
+                $('.category_row').on('contextmenu', function (e) {
+                    e.preventDefault();
+                    $('#deleteBtn').data('colorId', '-1');
+                    $('#deleteBtn').data('sizeId', '-1');
+                    $('#editBtn').data('sizeId', '-1');
+                    $('#editBtn').data('colorId', '-1');
+                    $('#editBtn').removeClass('display-none');
+                    $('#contextMenu').css({
+                        top: e.pageY + 'px',
+                        left: e.pageX + 'px'
+                    }).addClass('is-open');
+                    var categoryId = $(this).data('categoryId');
+                    $('#deleteBtn').data('categoryId', categoryId);
+                    $('#deleteBtn').data('deleteRow', this);
+                    $('#editBtn').data('categoryId', categoryId);
+                    $('#editBtn').data('row', this);
+                })
+            }
+        {% endif %}
+        {% if perms.product.delete_size %}
+            function deleteSize() {
+                var id = $('#deleteBtn').data('sizeId');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var dataTable = $('#size_list').DataTable();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                        size_id: id
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        dataTable.row($(deleteRow)).remove().draw();
+                        removeVariants(data);
+                        showToast('Size has been deleted', 'success');
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                        if ('permission_denied' in errors) {
+                            showToast(errors.permission_denied, 'error');
+                        } else {
+                            showToast('Error occurred while deleting Size', 'error');
+                        }
+                    }
+                });
+            }
+        {% endif %}
+        {% if perms.product.delete_color %}
+            function deleteColor() {
+                var id = $('#deleteBtn').data('colorId');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var dataTable = $('#color_list').DataTable();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                        color_id: id
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        dataTable.row($(deleteRow)).remove().draw();
+                        var row = $('#deleteBtn').data('delete-row');
+                        var td = $(row).find('td')[1];
+                        var oldData = $(td).text();
+                        $('.product_row').each(function () {
+                            var tds = $(this).find('td');
+                            if ($(tds[5]).text() == oldData) {
+                                $(tds[5]).text('');
+                            }
+                        });
+                        showToast('Color has been deleted', 'success');
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                        if ('permission_denied' in errors) {
+                            showToast(errors.permission_denied, 'error');
+                        } else {
+                            showToast('Error occurred while deleting Color', 'error');
+                        }
+                    }
+                });
+            }
+        {% endif %}
+        {% if perms.product.delete_category %}
+            function deleteCategory() {
+                var id = $('#deleteBtn').data('categoryId');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var dataTable = $('#category_list').DataTable();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                        category_id: id
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        dataTable.row($(deleteRow)).remove().draw();
+                        removeVariants(data);
+                        showToast('Category has been deleted', 'success');
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                        if ('permission_denied' in errors) {
+                            showToast(errors.permission_denied, 'error');
+                        } else {
+                            showToast('Error occurred while deleting Category', 'error');
+                        }
+                    }
+                });
+            }
+        {% endif %}
+
+        {% if perms.product.delete_size or perms.product.delete_color or perms.product.delete_category %}
+            function removeVariants(variantIdList) {
+                var dataTable = $('#product_list').DataTable();
+                for (id of variantIdList) {
+                    $('.variant_id').each(function () {
+                        if ($(this).text() == id) {
+                            dataTable.row($(this)).remove().draw();
+                        }
+                    })
+                }
+            }
+
+            function confirmDelete() {
+                var sizeId = $('#deleteBtn').data('sizeId');
+                var colorId = $('#deleteBtn').data('colorId');
+                var categoryId = $('#deleteBtn').data('categoryId');
+                if (sizeId != '-1') {
+                    var action = confirm("If you delete this size then all related variant associated with this size will be deleted too.Do you want to continue?");
+                    if (action) {
+                        deleteSize();
+                    }
+                } else if (colorId != '-1') {
+                    var action = confirm("Do you want to delete this color?");
+                    if (action) {
+                        deleteColor();
+                    }
+
+                } else if (categoryId != '-1') {
+                    var action = confirm("If you delete this category then all related variant associated with this category will be deleted too.Do you want to continue?");
+                    if (action) {
+                        deleteCategory();
+                    }
+                } else {
+                    var totalOrder = $('#deleteBtn').data('totalOrder');
+                    if (totalOrder > 0) {
+                        var action = confirm("This product has " + totalOrder + " transaction. If you delete this then all transaction will be deleted. Do you to delete this product?");
+                        if (action) {
+                            deleteProductItem();
+                        }
+                    } else {
+                        var action = confirm("This product has no transaction. Do you want to delete this product? ");
+                        if (action) {
+                            deleteProductItem();
+                        }
+
+                    }
+                }
+            }
+        {% endif %}
+
+        $(document).ready(function () {
+            initDatatable();
+            initDatatable('#size_list');
+            initDatatable('#color_list');
+            initDatatable('#category_list');
+            //preventAutoFormSubmission();
+            /*----------------------*/
+            {% if perms.product.delete_productvariant %}
+                productListContextMenu();
+            {% endif %}
+            {% if perms.product.delete_color or perms.product.change_color %}
+                colorListContextMenu();
+            {% endif %}
+            {% if perms.product.delete_size or perms.product.change_size %}
+                sizeListContextMenu();
+            {% endif %}
+            {% if perms.product.delete_category or perms.product.change_category %}
+                categoryListContextMenu();
+            {% endif %}
+            {% if  perms.product.delete_productvariant or perms.product.delete_color or perms.product.change_color or perms.product.delete_size or perms.product.change_size or perms.product.delete_category or perms.product.change_category  %}
+                $(document).click(function () {
+                    $('#contextMenu').removeClass('is-open');
+                });
+            {% endif %}
+
+        });
+    </script>
+{% endblock %}
+

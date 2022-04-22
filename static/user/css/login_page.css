@@ -1,0 +1,8 @@
+.main-panel {
+    width: 100% !important;
+    height: 100% !important;
+    background-image: url('/static/site_image/login_backgorund.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}

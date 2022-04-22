@@ -1,0 +1,20 @@
+{% extends "partial_view/base.html" %}
+{% load static %}
+{% block container %}
+    {% block outside_wrapper %} {% endblock %}
+    <div class="wrapper ">
+        <!--Include Side bar-->
+        {% include "partial_view/sidebar.html" %}
+        <div class="main-panel">
+            <!-- Navbar -->
+            <!--Include Navbar-->
+            {% include "partial_view/navbar.html" %}
+            <!-- End Navbar -->
+            <div class="content">
+                {% block content %} {% endblock %}
+            </div>
+             {% include "partial_view/footer.html" %}
+        </div>
+    </div>
+
+{% endblock %}

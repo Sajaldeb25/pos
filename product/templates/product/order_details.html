@@ -1,0 +1,430 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-user">
+                <div class="card-header">
+                    <h5 class="card-title text-center">Order No- {{ order_details.id }}</h5>
+                    <hr style="margin:0px !important;">
+                </div>
+
+                <div class="card-body">
+                    <p><strong>Customer Info</strong></p>
+                    <hr style="margin:0px !important;">
+                    <div class="row pt-2">
+                        <div class="col-12 col-md-1">
+                            <table class="customer_info_table" style="width: 100%;">
+                                <tbody>
+                                <tr>
+                                    <td class="no_stretch"><label>Customer Name:</label></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <table class="customer_info_table" style="width: 100%;">
+                                <tbody>
+                                <tr>
+                                    <td><span class="form-control">{{ order_details.customer.customer_name }}</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12 col-md-1">
+                            <table class="customer_info_table" style="width: 100%;">
+                                <tbody>
+                                <tr>
+                                    <td class="no_stretch"><label>Customer Phone:</label></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <table class="customer_info_table" style="width: 100%;">
+                                <tbody>
+                                <tr>
+                                    <td><span class="form-control">{{ order_details.customer.customer_phone }}</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row pt-2">
+                        <div class="col-12 col-md-1">
+                            <table class="customer_info_table" style="width: 100%;">
+                                <tbody>
+                                <tr>
+                                    <td class="no_stretch"><label>Customer Address:</label></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12 col-md-11">
+                            <table class="customer_info_table" style="width: 100%;">
+                                <tbody>
+                                <tr>
+                                    <td><textarea disabled
+                                                  class="form-control">{{ order_details.customer.customer_address }}</textarea>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-9 col-12 text-center text-md-left">
+                            <h5 class="card-title">Order Info</h5>
+                        </div>
+                        <div class="col-md-3 col-12">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button id="posPrintBtn" type="button"
+                                            class="btn btn-round btn-primary btn-block mr-2 float-md-right"
+                                            onclick="printPosInvoice(`{{ pos_invoice }}`)">
+                                        Print pos
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button"
+                                            class="btn btn-round btn-primary btn-block mr-2 float-md-right">
+                                        Print invoice
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr style="margin:0px !important;">
+                </div>
+
+                <div class="card-body">
+                    <p><strong>Invoice Created By: #{{ order_details.sold_by.name }}</strong></p>
+                    <p>Date: {{ order_details.ordered_date|date:'d/m/Y h:i A' }}</p>
+                    <hr style="margin:0px !important;">
+                    <div class="row pt-2">
+                        <div class="col-12">
+                            <div class="table-responsive table_outside_border">
+                                <table class="table table-hover" id="invoiceTable">
+                                    <thead class="text-primary">
+                                    <th>ID</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>GSM</th>
+                                    <th>Size</th>
+                                    <th>Color</th>
+                                    <th>Price</th>
+                                    <th>Discount(%)</th>
+                                    <th>Quantity</th>
+                                    <th class="text-right">Sub Total</th>
+                                    </thead>
+                                    <tbody id="invoiceTableBody">
+                                    {% for item in order_details.items %}
+                                        <tr class="invoiceRow" data-id='{{ item.id }}'
+                                            data-amount='{{ item.sub_total }}'>
+                                            <td>{{ item.product.id }}</td>
+                                            <td>{{ item.product.product.product_name }}</td>
+                                            <td>{{ item.product.category }}</td>
+                                            <td>{{ item.product.gsm }}</td>
+                                            <td>{{ item.product.size }}</td>
+                                            <td>{{ item.product.color }}</td>
+                                            <td>{{ item.price_per_product|floatformat:2 }}</td>
+                                            <td>{{ item.discount_percent }}</td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td class="text-right">{{ item.sub_total|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div align="right">
+                                <table style="margin-right: 10px; margin-top: 15px;">
+                                    <tbody>
+                                    <tr>
+                                        <td class="text-right">Grand Total =</td>
+                                        <td class="text-right"
+                                            id="grandTotalTxt">{{ order_details.total_billed|floatformat:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right">Total due =</td>
+                                        <td class="text-right"
+                                            id="totalDueTxt">{{ order_details.total_due|floatformat:2 }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <table style="margin-bottom: 15px;">
+                                    <tbody>
+                                    <tr>
+                                        <td>Paid Total =</td>
+                                        <td id="paidTotalTxt">{{ order_details.paid_total|floatformat:2 }}</td>
+                                    </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-11 col-12 text-center text-md-left">
+                            <h5 class="card-title">Payment History</h5>
+                        </div>
+                        {% if not order_details.is_paid and perms.product.add_paymenthistory %}
+                            <div class="col-md-1 col-12">
+                                <button type="button" class="btn btn-round btn-primary btn-block mr-2 float-md-right"
+                                        data-toggle="modal" data-target="#payment_modal">
+                                    pay
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr style="margin:0px !important;">
+
+                <div class="card-body">
+                    <div class="row pt-2">
+                        <div class="col-12">
+                            <div class="table-responsive table_outside_border" id="payment_history">
+                                <table class="table table-hover" id="paymentListTable">
+                                    <thead class="text-primary">
+                                    <th>Payment Date</th>
+                                    <th>Amount(BDT)</th>
+                                    <th>Received By</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for payment in order_details.order_payment_history %}
+                                        <tr class="paymentList" data-payment-id='{{ payment.id }}'
+                                            data-amount='{{ payment.amount }}'>
+                                            <td>{{ payment.date|date:'d/m/Y h:i A' }}</td>
+                                            <td>{{ payment.amount|floatformat:2 }}</td>
+                                            <td>{{ payment.received_by.name }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% csrf_token %}
+    </div>
+{% endblock %}
+
+{% block outside_wrapper %}
+    {% if perms.product.add_paymenthistory %}
+        <!-- The Modal -->
+        <div class="modal fade" id="payment_modal" tabindex="-1" role="dialog"
+             aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Make Payment</h5>
+                    </div>
+                    <form method="post" id="paymentForm">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Amount</label>
+                                        <input onChange="amountChange()" onkeyup="amountChange()" type="number"
+                                               min="1.00"
+                                               name="amount"
+                                               max="{{ order_details.total_due|floatformat:2 }}"
+                                               step=".01"
+                                               required class="form-control"
+                                               placeholder="Enter amount"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary" id="submitBtn">Pay</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--Modal End-->
+    {% endif %}
+    {% if perms.product.delete_paymenthistory or perms.product.change_order %}
+        <ul class="ContextMenu ContextMenu--theme-default" id="contextMenu" data-contextmenu="0" tabindex="-1">
+            <li class="ContextMenu-item" tabindex="0" id="deleteBtn"
+                onclick="confirmDelete()" data-payment-id="-1" data-item-id="-1" data-delete-row data-amount="0"
+                data-delete-type="payment">
+                <i class="fa fa-minus-circle context-menu-icon"></i>
+                <strong style="margin-left: 20px;">Delete</strong>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+{% block add_new_js %}
+    <script src="{% static  '/product/js/check_field_error.js' %}"></script>
+    <script src="{% static  '/product/js/create_invoice.js' %}"></script>
+    <script src="{% static  '/product/js/ajax_request.js' %}"></script>
+    <script>
+        function amountChange() {
+            var inputItem = $('input[name="amount"]');
+            var max = parseFloat(inputItem.attr('max'));
+            if (inputItem.val() > max) {
+                inputItem.val(max.toFixed(2));
+            } else if (inputItem.val() < 0) {
+                inputItem.val(0);
+            }
+
+        }
+
+        {% if perms.product.change_order %}
+            function invoiceListContextMenu() {
+                $('.invoiceRow').on('contextmenu', function (e) {
+                    if ($('#invoiceTableBody').children().length > 1) {
+                        e.preventDefault();
+                        $('#contextMenu').css({
+                            top: e.pageY + 'px',
+                            left: e.pageX + 'px'
+                        }).addClass('is-open');
+                        var itemId = $(this).data('id');
+                        var amount = $(this).data('amount')
+                        $('#deleteBtn').data('itemId', itemId);
+                        $('#deleteBtn').data('deleteRow', this);
+                        $('#deleteBtn').data('deleteType', 'item');
+                        $('#deleteBtn').data('amount', amount);
+                    }
+                });
+            }
+
+            function itemDeleteSuccess(data, textStatus, jqXHR) {
+                $('#posPrintBtn').attr('onClick', 'printPosInvoice(`' + data + '`)');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var grandTotal = parseFloat($('#grandTotalTxt').text());
+                var totalDue = parseFloat($('#totalDueTxt').text());
+                var paidTotal = parseFloat($('#paidTotalTxt').text());
+                var deletedAmount = parseFloat($('#deleteBtn').data('amount'));
+                grandTotal = grandTotal - deletedAmount;
+                $('#grandTotalTxt').text(grandTotal.toFixed(2));
+                $('#totalDueTxt').text((grandTotal - paidTotal).toFixed(2));
+                $('input[name="amount"]').attr('max', (grandTotal - paidTotal).toFixed(2));
+                $(deleteRow).remove();
+                showToast('Item has been deleted', 'success');
+            }
+
+            function itemDeleteError(data, textStatus, jqXHR) {
+                var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                if ('permission_denied' in errors) {
+                    showToast(errors.permission_denied, 'error');
+                } else {
+                    showToast('Error occurred while deleting item', 'error');
+                }
+            }
+
+            function itemDelete() {
+                var itemId = $('#deleteBtn').data('itemId');
+                ajaxRequest({
+                    csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                    item_id: itemId
+                }, 'itemDelete');
+            }
+        {% endif %}
+        {% if perms.product.delete_paymenthistory %}
+            function paymentListContextMenu() {
+                $('.paymentList').on('contextmenu', function (e) {
+                    e.preventDefault();
+                    $('#contextMenu').css({
+                        top: e.pageY + 'px',
+                        left: e.pageX + 'px'
+                    }).addClass('is-open');
+                    var paymentId = $(this).data('paymentId');
+                    var amount = $(this).data('amount')
+                    $('#deleteBtn').data('paymentId', paymentId);
+                    $('#deleteBtn').data('deleteRow', this);
+                    $('#deleteBtn').data('deleteType', 'payment');
+                    $('#deleteBtn').data('amount', amount);
+                });
+            }
+
+            function paymentDeleteSuccess(data, textStatus, jqXHR) {
+                $('#posPrintBtn').attr('onClick', 'printPosInvoice(`' + data + '`)');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var totalDue = parseFloat($('#totalDueTxt').text());
+                var paidTotal = parseFloat($('#paidTotalTxt').text());
+                var paidAmount = parseFloat($('#deleteBtn').data('amount'));
+                $('#totalDueTxt').text((totalDue + paidAmount).toFixed(2));
+                $('#paidTotalTxt').text((paidTotal - paidAmount).toFixed(2));
+                $('input[name="amount"]').attr('max', (totalDue + paidAmount).toFixed(2));
+                $(deleteRow).remove();
+                showToast('Payment has been deleted', 'success');
+            }
+
+            function paymentDeleteError(data, textStatus, jqXHR) {
+                var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                if ('permission_denied' in errors) {
+                    showToast(errors.permission_denied, 'error');
+                } else {
+                    showToast('Error Deleting payment history', 'error');
+                }
+            }
+
+            function paymentDelete() {
+                var paymentId = $('#deleteBtn').data('paymentId');
+                ajaxRequest({
+                    csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                    payment_id: paymentId
+                }, 'paymentDelete');
+            }
+        {% endif %}
+
+        function confirmDelete() {
+            var type = $('#deleteBtn').data('deleteType');
+            var action = confirm('Do you really want to delete this ' + type + '!!');
+            if (action) {
+                window[type + 'Delete']()
+            }
+        }
+
+        $(document).ready(function () {
+            initDatatable();
+            preventAutoFormSubmission();
+            checkFieldError();
+            /*------------*/
+            {% if perms.product.delete_paymenthistory %}
+                paymentListContextMenu();
+            {% endif %}
+            {% if perms.product.change_order %}
+                invoiceListContextMenu();
+            {% endif %}
+            {% if perms.product.add_paymenthistory %}
+                $('#paymentForm').on('submit', function (e) {
+                    if ($("#submitBtn").prop('attempted') == 'true') {
+                        e.preventDefault();
+                    } else {
+                        $("#submitBtn").prop("attempted", 'true');
+                    }
+                });
+            {% endif %}
+            {% if perms.product.change_order or perms.product.delete_paymenthistory %}
+                $(document).click(function () {
+                    $('#contextMenu').removeClass('is-open');
+                });
+            {% endif %}
+        });
+    </script>
+{% endblock %}
+
+

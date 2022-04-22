@@ -1,0 +1,336 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 col-md-8">
+                    <!--Customer Info -->
+                    <div class="card card-user">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-10 col-12 text-center text-md-left">
+                                    <h5 class="card-title text-center">Customer ID- {{ customer_details.id }}</h5>
+                                </div>
+                                {% if customer_form and perms.product.change_customer %}
+                                    <div class="col-md-2 col-12">
+                                        <button type="button"
+                                                class="btn btn-round min-width-120 btn-primary mr-2 float-md-right"
+                                                data-toggle="modal" data-target="#customerEditModal"
+                                                id="customerEditBtn">
+                                            Edit
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <hr style="margin:0px !important;">
+                        </div>
+                        <!--card header end -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="category">customer Name</label>
+                                        <input type="text" disabled class="form-control input-text"
+                                               id="customerNameTxt" value="{{ customer_details.customer_name }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="category">Mobile No</label>
+                                        <input type="text" disabled class="form-control input-text"
+                                               id="customerPhoneTxt" value="{{ customer_details.customer_phone }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="product_description">Address</label>
+                                        <textarea type="text" disabled class="form-control input-text"
+                                                  id="customerAddressTxt">{{ customer_details.customer_address }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!--Customer Info end -->
+                </div>
+                <div class="col-md-4 col-12">
+                    <!--Customer Info -->
+                    <div class="card card-user">
+                        <!--card header end -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <ul class="list-group">
+                                        <li class="list-group-item">Total order: <span
+                                                id="totalOrderTxt">{{ customer_details.orders|length }}</span></li>
+                                        <li class="list-group-item">Total Item: <span
+                                                id="totalItemTxt">{{ customer_details.total_item }}</span></li>
+                                        <li class="list-group-item">Total Billed: <span
+                                                id="totalBilledTxt">{{ customer_details.total_billed|floatformat:2 }}</span>
+                                        </li>
+                                        <li class="list-group-item">Total Paid: <span
+                                                id="totalPaidTxt">{{ customer_details.total_paid|floatformat:2 }}</span>
+                                        </li>
+                                        <li class="list-group-item">Total Due: <span
+                                                id="totalDueTxt">{{ customer_details.total_due|floatformat:2 }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Product Info end -->
+                </div>
+            </div>
+            <!--Order history-->
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-12 text-center text-md-left">
+                            <h5 class="card-title">Order History</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pt-2">
+                        <div class="col-12">
+                            <div class="table-responsive table_outside_border">
+                                <table class="table table-hover" id="product_list">
+                                    <thead class="text-primary">
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Total Item</th>
+                                    <th>Total Billed</th>
+                                    <th>Total Paid</th>
+                                    <th>Total Due</th>
+                                    <th>Sold by</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in customer_details.orders %}
+                                        <tr>
+                                            <td onclick="redirect_new_page('{% url 'product:order_details' item.id %}')"
+                                                class="hover-active cursor-pointer">
+                                                {{ item.id }}
+                                            </td>
+                                            <td>{{ item.ordered_date|date:'d/m/Y h:i A' }}</td>
+                                            <td>{{ item.items }}</td>
+                                            <td>{{ item.billed|floatformat:2 }}</td>
+                                            <td>{{ item.paid_total|floatformat:2 }}</td>
+                                            <td>{{ item.due|floatformat:2 }}</td>
+                                            <td>{{ item.sold_by.name }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Order history end-->
+            <!--Payment history-->
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-12 text-center text-md-left">
+                            <h5 class="card-title">Payment History</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pt-2">
+                        <div class="col-12">
+                            <div class="table-responsive table_outside_border">
+                                <table class="table table-hover" id="paymentHistoryDataTable">
+                                    <thead class="text-primary">
+                                    <th>Payment ID</th>
+                                    <th>Date</th>
+                                    <th>Order Id</th>
+                                    <th>Total Billed</th>
+                                    <th>Payment Amount</th>
+                                    <th>Total Due</th>
+                                    <th>Received by</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for order in customer_details.orders %}
+                                        {% for item in order.payments %}
+                                            <tr>
+                                                <td>{{ item.id }}</td>
+                                                <td>{{ item.date|date:'d/m/Y h:i A' }}</td>
+                                                <td onclick="redirect_new_page('{% url 'product:order_details' order.id %}')"
+                                                    class="hover-active cursor-pointer">
+                                                    {{ order.id }}
+                                                </td>
+                                                <td>{{ order.billed|floatformat:2 }}</td>
+                                                <td>{{ item.amount|floatformat:2 }}</td>
+                                                <td>{{ order.due|floatformat:2 }}</td>
+                                                <td>{{ item.received_by.name }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Payment history end-->
+        </div>
+    </div>
+{% endblock %}
+
+{% block outside_wrapper %}
+    {% if perms.product.change_customer %}
+        <!-- The Product edit Modal -->
+        <div class="modal fade" id="customerEditModal" tabindex="-1" role="dialog"
+             aria-labelledby="supplierEditModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="supplierEditModalLabel">Edit Customer
+                            Info</h5>
+                    </div>
+                    <form method="post" id="customerForm">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        {{ customer_form.customer_name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Mobile No
+                                            <span class="error_text" id="customer_phone_error_text"></span>
+                                        </label>
+                                        {{ customer_form.customer_phone }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Address</label>
+                                        {{ customer_form.customer_address }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--The Product edit End-->
+    {% endif %}
+{% endblock %}
+{% block add_new_js %}
+    <script src="{% static '/product/js/ajax_request.js' %}"></script>
+    <script>
+        /*-------------*/
+        {% if perms.product.change_customer %}
+            function showSpinner() {
+                $('#spinner').removeClass('display-none');
+                $('#save_btn_txt').addClass('display-none');
+            }
+
+            function hideSpinner() {
+                $('#spinner').addClass('display-none');
+                $('#save_btn_txt').removeClass('display-none');
+            }
+
+            function initErrorText() {
+                $('#customer_phone_error_text').text('');
+                $('input[name="customer_phone"]').removeClass('error_border');
+            }
+
+            /*---------*/
+            function customerEditSuccess(data, textStatus, jqXHR) {
+                hideSpinner();
+                window.name = $('input[name="customer_name"]').val();
+                window.phone = $('input[name="customer_phone"]').val();
+                window.address = $('textarea[name="customer_address"]').val();
+                $('#customerNameTxt').val(window.name);
+                $('#customerPhoneTxt').val(window.phone);
+                $('#customerAddressTxt').val(window.address);
+                $('#customerEditModal').modal('hide');
+                showToast('Customer info edited successfully', 'success');
+            }
+
+            function customerEditError(data, textStatus, jqXHR) {
+                hideSpinner();
+                var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                if ('permission_denied' in errors) {
+                    showToast(errors.permission_denied, 'error');
+                } else {
+                    showToast('Error occurred during saving the customer info', 'error');
+                }
+                if ('customer_phone' in errors) {
+                    $('#customer_phone_error_text').text(errors.customer_phone[0]);
+                }
+
+            }
+        {% endif %}
+
+        /*----------------------------------------------------*/
+        $(document).ready(function () {
+            initDatatable();
+            initDatatable('#paymentHistoryDataTable');
+            preventAutoFormSubmission();
+            /*-------------*/
+            {% if perms.product.change_customer %}
+                window.name = $(`{{ customer_form.customer_name }}`).val();
+                window.phone = $(`{{ customer_form.customer_phone }}`).val();
+                window.address = $(`{{ customer_form.customer_address }}`).val();
+
+                $('#customerEditBtn').on('click', function () {
+                    $('input[name="customer_name"]').val(window.name);
+                    $('input[name="customer_phone"]').val(window.phone);
+                    $('textarea[name="customer_address"]').val(window.address);
+                    initErrorText();
+                });
+
+                $("#customerForm").bind("submit", function (e) {
+                    e.preventDefault();
+                    showSpinner();
+                    if ($('input[name="customer_phone"]').val() == window.phone) {
+                        $('#isProductEdited').val(1)
+                    }
+                    var data = $(this).serialize();
+                    ajaxRequest(data, 'customerEdit')
+                });
+            {% endif %}
+
+        });
+
+    </script>
+{% endblock %}
+
+

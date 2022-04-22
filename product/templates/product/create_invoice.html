@@ -1,0 +1,303 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block add_custom_css %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+{% endblock %}
+{% block outside_wrapper %}
+    <ul class="ContextMenu ContextMenu--theme-default" id="contextMenu" data-contextmenu="0" tabindex="-1">
+        <li class="ContextMenu-item" tabindex="0" id="remove-button"
+            onclick="removeInvoiceItem()" data-invoice-parent-row="0" data-invoice-item-row="0">
+            <i class="fa fa-minus-circle context-menu-icon"></i>
+            <strong style="margin-left: 20px;">Remove</strong>
+        </li>
+    </ul>
+{% endblock %}
+{% block content %}
+    {% if pos_invoice and order_id %}
+        <div class="card" style="padding: 0px 30px; position: relative !important;">
+            <div class="row">
+                <div class="col-12 col-md-6 text-center text-md-left mt-md-0 mt-2">
+                    <h7 class="vertical-md-align" style="color: green;">{{ order_id }} no invoice has been created.</h7>
+                </div>
+                <div class="col-12 col-md-6">
+                    <button type="submit" class="btn btn-round btn-primary btn-round" style="float: right">
+                        Normal print
+                    </button>
+                    <button type="button" class="btn btn-round btn-primary btn-round mr-2"
+                            onclick="printPosInvoice(`{{ pos_invoice }}`)" style="float: right">
+                        Pos print
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <form action="{% url 'product:create_invoice' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-user">
+                    <div class="card-header text-center">
+                        <h5 class="card-title"><strong>Mabjs Enterprise & Printing Press</strong></h5>
+                        <h7>Ramdia Bazar, Baliakandi, Rajbari.</h7>
+                        <br>
+                        <h7>Proprietor's: Emamul Ehsan Sumon & Abdul Kader Babu</h7>
+                        <br>
+                        <h7>Contact no: 01315657051, 01723583432</h7>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-11">
+                                <div class="form-group">
+                                    <label>Customer Name
+                                        <span class="error_text" id="customer_error_text"></span>
+                                        {% if order.customer.errors %}
+                                            {{ order.customer.errors|striptags|json_script:"customer_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ order.customer }}
+                                    {{ order.customer_name }}
+                                </div>
+                            </div>
+                            <div class="col-md-1 col-2 align-self-center pl-1 mt-2">
+                                <div class="row">
+                                    <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                         id="new_customer"><i class="fa fa-plus"></i></btn>
+                                    <btn class="btn btn-sm btn-outline-success btn-round btn-icon display-none"
+                                         id="cancel_new_customer"><i class="fa fa-times-circle"></i></btn>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row display-none" id="customer_phone">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Mobile No
+                                        <span class="error_text" id="customer_phone_error_text"></span>
+                                        {% if order.customer_phone.errors %}
+                                            {{ order.customer_phone.errors|striptags|json_script:"customer_phone_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ order.customer_phone }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row display-none" id="customer_address">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Address
+                                        <span class="error_text" id="customer_address_error_text"></span>
+                                        {% if order.customer_address.errors %}
+                                            {{ order.customer_address.errors|striptags|json_script:"customer_address_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ order.customer_address }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive table_outside_border">
+                            <table class="table table-hover" id="invoice_table">
+                                <thead class="text-primary">
+                                <th>ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>GSM</th>
+                                <th>Size</th>
+                                <th>Color</th>
+                                <th>Price</th>
+                                <th>Discount(%)</th>
+                                <th>Quantity</th>
+                                <th class="text-right">Sub Total</th>
+                                </thead>
+                                <tbody id="invoice_item">
+                                <tr id="invoice_empty_msg" style="display: none;">
+                                    <td colspan="10" class="text-center">Select at least one Item</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div align="right">
+                            <table style="margin-right: 10px; margin-top: 15px;">
+                                <tbody>
+                                <tr>
+                                    <td class="text-right">Grand Total =</td>
+                                    <td class="text-right" id="grand_total">----</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right">Total due =</td>
+                                    <td class="text-right" id="total_due">----</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <table style="margin-bottom: 15px;">
+                                <tbody>
+                                <tr>
+                                    <td>Paid Total =</td>
+                                    <td>{{ order.paid_total }}</td>
+                                </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                        <div class="row">
+                            <div class="update ml-auto mr-auto">
+                                <button type="submit" class="btn btn-primary btn-round" id="submitButton">Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ items.management_form }}
+        <div id="empty_form_quantity" style="display: none;">
+            {{ items.empty_form.quantity }}
+        </div>
+        <div id="empty_form_price_per_product" style="display: none;">
+            {{ items.empty_form.price_per_product }}
+        </div>
+        <div id="empty_form_discount_percent" style="display: none;">
+            {{ items.empty_form.discount_percent }}
+        </div>
+        <div id="empty_form_product" style="display: none;">
+            <td>{{ items.empty_form.product }}</td>
+        </div>
+    </form>
+
+    <div class="row product_list">
+        <div class="col col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title text-center text-md-left"> All products </h4>
+                </div>
+            <hr/>
+                <div class="card-body">
+                    <div class="table-responsive product_list_table">
+                        <table class="table table-hover" id="product_list" data-page-length='100'>
+                            <thead class=" text-primary">
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>GSM</th>
+                            <th>Size</th>
+                            <th>Color</th>
+                            <th class="text-right">Price/piece(BDT)</th>
+                            <th class="text-center">Discount(%)</th>
+                            <th class="text-right">Total Stock</th>
+                            </thead>
+                            <tbody>
+                            {% for product in product_list %}
+                                {% for variant in product.product_variant %}
+                                    {% if product.product_variant %}
+                                        <tr id="invoice-parent-row-{{ variant.id }}" class="product_item"
+                                            onclick="addInvoiceItem({
+                                                    product_name: `{{ variant.product.product_name }}`,
+                                                    variant_id: `{{ variant.id }}`,
+                                                    category: `{{ variant.category.category }}`,
+                                                    color: `{{ variant.color.color }}`,
+                                                    size: `{{ variant.size.size }}`,
+                                                    gsm: `{{ variant.gsm }}`,
+                                                    price: `{{ variant.price|floatformat:2 }}`,
+                                                    stock_total: `{{ variant.stock_total }}`,
+                                                    discount_percent: `{{ variant.discount_percent }}`,
+                                                    discount_min_purchase: `{{ variant.discount_min_purchase }}`
+                                                    }, $(this))" style="cursor: pointer;">
+                                            <td>{{ variant.id }}</td>
+                                            <td>{{ product.product_name }}</td>
+                                            <td>{{ variant.category }}</td>
+                                            <td>{{ variant.gsm }}</td>
+                                            <td>{{ variant.size }}</td>
+                                            <td>{{ variant.color }}</td>
+                                            <td class="text-right">{{ variant.price|floatformat:2 }}</td>
+                                            <td class="text-center">{{ variant.discount_percent }} <br>
+                                                <span style="font-size: 10px;">Min purchase- {{ variant.discount_min_purchase }}</span>
+                                            </td>
+                                            <td class="text-right">{{ variant.stock_total }}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for item in selected_items %}
+        {{ item.product }}
+    {% endfor %}
+
+    {% block add_new_js %}
+        <script src="{% static '/product/js/check_field_error.js' %}"></script>
+        <script src="{% static '/product/js/create_invoice.js' %}"></script>
+        <script>
+            $(document).ready(function () {
+                initDatatable();
+                preventAutoFormSubmission();
+                checkFieldError();
+                /*----------------------*/
+                checkTableEmpty();
+                paidTotalInputFieldChange();
+
+                $('#customer_select').attr('required', true);
+                $('#new_customer').on('click', function () {
+                    initNewCustomer();
+                });
+
+                $('#contextMenu').click(function () {
+                    $('#contextMenu').removeClass('is-open');
+                });
+                $(document).click(function () {
+                    $('#contextMenu').removeClass('is-open');
+                });
+
+                $('#cancel_new_customer').on('click', function () {
+                    initInitialOrderForm();
+                });
+
+                $('#submitButton').on('click', function (e) {
+                     if ($("#submitButton").prop('attempted') == 'true') {
+                        e.preventDefault();
+                    } else {
+                        $("#submitButton").prop("attempted", 'true');
+                    }
+                    if (!($('#paid_total_field').val())) {
+                        e.preventDefault();
+                    }
+                    if (!($('#paid_total_field').val()) && $('#invoice_item').children().length > 1) {
+                        $('#paid_total_field').addClass('error_border');
+                    } else {
+                        $('#paid_total_field').removeClass('error_border');
+                    }
+                });
+
+                {% if order.customer_phone.errors %}
+                    initNewCustomer();
+                {% endif %}
+                {% if selected_items %}
+                    $('.product_item').each(function () {
+                        $tds = $(this).find('td');
+                        var i = 0;
+                        {% for item in selected_items %}
+                            var selectedId = '{{ item.product }}';
+                            var id = $($tds).text();
+                            id = parseInt(id);
+                            if (selectedId == id) {
+                                $tds[0].click();
+                                var quantity = '{{ item.quantity }}';
+                                quantity = parseInt(quantity);
+                                $('#id_form-' + i + '-quantity').val(quantity);
+                                $('#paid_total_field').val();
+                                $('#id_form-' + i + '-quantity').trigger('change');
+                            }
+                            i++;
+                        {% endfor %}
+                    });
+                {% endif %}
+            })
+        </script>
+
+    {% endblock %}
+{% endblock %}
+

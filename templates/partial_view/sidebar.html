@@ -1,0 +1,143 @@
+
+  {% load static  %}
+  {% load custom_tags %}
+  {% url 'dashboard:dashboard' as dashboard %}
+  <div class="sidebar" data-color="white" data-active-color="danger">
+      <!--
+        Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red | yellow"
+    -->
+      <div class="logo">
+        <!--<a href="http://www.creative-tim.com" class="simple-text logo-mini">
+          <div class="logo-image-small">
+            <img src="{% static '/site_image/logo.jpg' %}">
+          </div>
+        </a>-->
+        <a href="http://www.creative-tim.com" class="simple-text logo-normal">
+          <div class="logo-image-big text-center">
+            <img style="height: 100px;" src="{% static '/site_image/logo.jpg' %}">
+          </div>
+        </a>
+      </div>
+      <div class="sidebar-wrapper">
+        <ul class="nav">
+          <li class="{% active request 'dashboard:dashboard' 'active' %}">
+            <a href="{% url 'dashboard:dashboard' %}">
+              <i class="nc-icon nc-bank"></i>
+              <p>Dashboard</p>
+            </a>
+          </li>
+          {% if perms.product.add_order %}
+              <li class="{% active request 'product:create_invoice' 'active' %}">
+                <a href="{% url 'product:create_invoice' %}">
+                <i class="nc-icon nc-calendar-60"></i>
+                  <p>Create Invoice</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.product.view_order %}
+              <li class="{% active request 'product:order_list' 'active' %}">
+                <a href="{% url 'product:order_list' %}">
+                  <i class="nc-icon nc-paper"></i>
+                  <p>Sold List</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.product.view_product %}
+               <li class="{% active request 'product:product_list' 'active' %}">
+                <a href="{% url 'product:product_list' %}">
+                  <i class="nc-icon nc-single-copy-04"></i>
+                  <p>All product list</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.product.view_product %}
+              <li class="{% active request 'product:variant_list' 'active' %}">
+                <a href="{% url 'product:variant_list' %}">
+                  <i class="nc-icon nc-single-copy-04"></i>
+                  <p>All variant list</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.product.add_product %}
+              <li class="{% active request 'product:new_product' 'active' %}">
+                <a href="{% url 'product:new_product' %}">
+                  <i class="nc-icon nc-simple-add"></i>
+                  <p>Add new product</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.user.view_user %}
+              <li class="{% active request 'user:employee_list' 'active' %}">
+                <a href="{% url 'user:employee_list' %}">
+                  <i class="nc-icon nc-badge"></i>
+                  <p>Employee List</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.user.view_user %}
+              <li class="{% active request 'user:deactivate_employees' 'active' %}">
+                <a href="{% url 'user:deactivate_employees' %}">
+                  <i class="nc-icon nc-badge"></i>
+                  <p>Deactivate employees</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.user.add_user %}
+              <li class="{% active request 'user:add_employee' 'active' %}">
+                <a href="{% url 'user:add_employee' %}">
+                  <i class="nc-icon nc-circle-10"></i>
+                  <p>Add New Employee</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.product.view_supplier %}
+              <li class="{% active request 'product:supplier_list' 'active' %}">
+                <a href="{% url 'product:supplier_list' %}">
+                  <i class="nc-icon nc-badge"></i>
+                  <p>Supplier List</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.product.add_supplier %}
+              <li class="{% active request 'product:new_supplier' 'active' %}">
+                <a href="{% url 'product:new_supplier' %}">
+                  <i class="nc-icon nc-circle-10"></i>
+                  <p>Add New Supplier</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.product.view_customer %}
+              <li class="{% active request 'product:customer_list' 'active' %}">
+                <a href="{% url 'product:customer_list' %}">
+                  <i class="nc-icon nc-badge"></i>
+                  <p>Customer List</p>
+                </a>
+              </li>
+          {% endif %}
+          {% if perms.product.view_othercost %}
+              <li class="{% active request 'product:other_cost' 'active' %}">
+                <a href="{% url 'product:other_cost' %}">
+                  <i class="nc-icon nc-paper"></i>
+                  <p>Other costs</p>
+                </a>
+             </li>
+         {% endif %}
+         {% if perms.investor.view_shareholder %}
+             <li class="{% active request 'investor:investors' 'active' %}">
+                <a href="{% url 'investor:investors' %}">
+                  <i class="nc-icon nc-badge"></i>
+                  <p>Shareholders</p>
+                </a>
+             </li>
+         {% endif %}
+         {% if perms.investor.view_shareholderreleasehistory %}
+             <li class="{% active request 'investor:release_history' 'active' %}">
+                <a href="{% url 'investor:release_history' %}">
+                  <i class="nc-icon nc-badge"></i>
+                  <p>Released history</p>
+                </a>
+             </li>
+         {% endif %}
+        </ul>
+      </div>
+    </div>

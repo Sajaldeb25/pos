@@ -1,0 +1,88 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static '/common/img/apple-icon.png' %}">
+    <link rel="icon" type="image/png" href="static '/common/img/favicon.png' %}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>
+        Paper Dashboard 2 by Creative Tim
+    </title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no'
+          name='viewport'/>
+    <!--     Fonts and icons     -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet"/>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+    <!-- CSS Files -->
+    <link href="{% static 'common/css/bootstrap.min.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link href="{% static 'common/css/paper-dashboard.css' %}" rel="stylesheet"/>
+    <link href="{% static '/common/css/jquery.datepicker2.css' %}" rel="stylesheet"/>
+    <link href="{% static '/common/css/datepicker.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+
+    <link href="{% static '/common/css/sr.css' %}" rel="stylesheet"/>
+    <link href="{% static '/common/css/spinner.css' %}" rel="stylesheet"/>
+    <link href="{% static '/common/css/custom.css' %}" rel="stylesheet"/>
+    {% block add_custom_css %} {% endblock %}
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+</head>
+
+<body class="">
+{% block container %} {% endblock %}
+<div class="toast" id="mainToast" style="position: absolute; top: 6px; right: 11px; z-index: 10000;">
+    <div class="toast-body" id="toastText">
+
+    </div>
+</div>
+
+<!--   Core JS Files   -->
+<script src="{% static 'common/js/core/jquery.min.js' %}"></script>
+<script src="{% static 'common/js/core/popper.min.js' %}"></script>
+<script src="{% static 'common/js/core/bootstrap.min.js' %}"></script>
+<script src="{% static 'common/js/plugins/perfect-scrollbar.jquery.min.js' %}"></script>
+
+<!-- Chart JS -->
+<script src="{% static 'common/js/plugins/chartjs.min.js' %}"></script>
+<!--  Notifications Plugin    -->
+<script src="{% static 'common/js/plugins/bootstrap-notify.js' %}"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- Control Center for Now Ui Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="{% static 'common/js/paper-dashboard.js' %}" type="text/javascript"></script>
+<script src="{% static '/common/js/plugins/jquery.datepicker2.js' %}"></script>
+<script src="{% static '/common/js/plugins/datepicker.js' %}"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<script src="{% static '/common/demo/demo.js' %}"></script>
+<!-- Paper Dashboard DEMO methods, don't include it in your project! -->
+{% block add_new_js %} {% endblock %}
+<script>
+    function showToast(msg, background) {
+        if (background == 'error') {
+            background = 'toast-background-error';
+        } else if (background == 'success') {
+            background = 'toast-background-success';
+        }
+        $('#mainToast').removeClass('toast-background-error');
+        $('#mainToast').removeClass('toast-background-success');
+        $('#mainToast').addClass(background);
+        $('#toastText').text(msg);
+        $('#mainToast').toast('show');
+
+    }
+
+    $(document).ready(function () {
+        $.datePicker.defaults.dateFormat = function (date) {
+            return (date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear());
+        };
+        $('#mainToast').toast({
+            delay: 2000
+        });
+        // Javascript method's body can be found in assets/assets-for-demo/js/demo.js
+    });
+</script>
+</body>
+
+</html>

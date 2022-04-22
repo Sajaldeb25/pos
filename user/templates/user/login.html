@@ -1,0 +1,77 @@
+{% extends "partial_view/base.html" %}
+{% load static %}
+{% block container %}
+    <link href="{% static '/user/css/login_page.css' %}" rel="stylesheet"/>
+    <div class="wrapper ">
+        <div class="main-panel">
+            <div class="content h-100">
+                <div class="container h-75">
+                    <div class="row justify-content-center align-items-center h-100">
+                        <div class="col-lg-4 col-md-6 ml-auto mr-auto">
+                            <form class="form" method="POST" action="">
+                                {% csrf_token %}
+                                <div class="card card-login">
+                                    <div class="card-header ">
+                                        <div class="card-header ">
+                                            <div class="logo">
+                                                <a class="simple-text logo-normal">
+                                                    <div class="logo-image-big text-center">
+                                                        <img style="height: 100px;"
+                                                             src="{% static '/site_image/logo.jpg' %}">
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <h3 class="text-center" style="margin-bottom: 0px !important;">Login</h3>
+                                        </div>
+
+                                    </div>
+                                    <div class="card-body ">
+                                        {% if form.errors %}
+                                            {% for field in form %}
+                                                {% for error in field.errors %}
+                                                    <div class="alert alert-danger">
+                                                        <strong>{{ error|escape }}</strong>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="nc-icon nc-single-02"></i>
+                                                </span>
+                                            </div>
+                                            {{ form.username }}
+                                        </div>
+
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="nc-icon nc-single-02"></i>
+                                    </span>
+                                            </div>
+                                            {{ form.password }}
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-warning btn-round mb-3">sign in
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block add_new_js %}
+    <script>
+        $(document).ready(function () {
+            preventAutoFormSubmission();
+        });
+    </script>
+{% endblock %}

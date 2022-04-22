@@ -1,0 +1,239 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/user/css/add_new_employee.css' %}" rel="stylesheet"/>
+    <form action="{% url 'user:add_employee' %}" method="POST" enctype="multipart/form-data" id="employeeForm">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-user">
+                    <div class="image">
+                        <img src="{% static '/common/img/damir-bosnjak.jpg' %}" alt="...">
+                    </div>
+                    <div class="card-body min-height-auto">
+                        <div class="author">
+                            <a>
+                                <img onclick="$('#img_input').click()" class="avatar border-gray" id="img_preview"
+                                     src="{% static '/common/img/mike.jpg' %}" alt="...">
+                                {{ form.profile_pic }}
+                                <h5 class="title" id="username"></h5>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="permission-title">
+                            <h6>Position</h6>
+                        </div>
+                        <div class="checkbox-wrapper" style="margin: 15px;">
+                            {% if perms.can_promote_superuser %}
+                                <div class="form-check">
+                                    <label class="form-check-label">{{ form.is_superuser }}
+                                        <span class="form-check-sign"></span>
+                                        Super user
+                                    </label>
+                                </div>
+                            {% endif %}
+                            {% if perms.can_promote_admin %}
+                                <div class="form-check">
+                                    <label class="form-check-label">{{ form.is_admin }}
+                                        <span class="form-check-sign"></span>
+                                        Admin
+                                    </label>
+                                </div>
+                            {% endif %}
+                            <div class="form-check" style="position: relative !important;">
+                                <label class="form-check-label">{{ form.is_seller }}
+                                    <span class="form-check-sign"></span>
+                                    Staff
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card card-user">
+                    <div class="card-header">
+                        <h5 class="card-title">Add New Employee</h5>
+                    </div>
+                    <div class="card-body">
+                        <!--                <form>-->
+                        <div class="row">
+                            <div class="col-md-6 pr-1">
+                                <div class="form-group">
+                                    <label>Full Name
+                                        <span class="error_text" id="name_error_text"></span>
+                                        {% if form.name.errors %}
+                                            {{ form.name.errors|striptags|json_script:"name_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.name }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-1">
+                                <div class="form-group">
+                                    <label for=email">
+                                        Email <span class="error_text" id="email_error_text"></span>
+                                        {% if form.email.errors %}
+                                            {{ form.email.errors|striptags|json_script:"email_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-1">
+                                <div class="form-group">
+                                    <label>Phone No 1
+                                        <span class="error_text" id="phone_no1_error_text"></span>
+                                        {% if form.phone_no1.errors %}
+                                            {{ form.phone_no1.errors|striptags|json_script:"phone_no1_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.phone_no1 }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-1">
+                                <div class="form-group">
+                                    <label for=email">
+                                        Phone no2 <span class="error_text" id="phone_no2_error_text"></span>
+                                        {% if form.phone_no2.errors %}
+                                            {{ form.phone_no2.errors|striptags|json_script:"phone_no2_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.phone_no2 }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>NID
+                                        <span class="error_text" id="nid_error_text"></span>
+                                        {% if form.nid.errors %}
+                                            {{ form.nid.errors|striptags|json_script:"nid_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.nid }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 pr-1">
+                                <div class="form-group">
+                                    <label for="gender">Gender
+                                        <span class="error_text" id="gender_error_text"></span>
+                                        {% if form.gender.errors %}
+                                            {{ form.gender.errors|striptags|json_script:"gender_error" }}
+                                        {% endif %}
+                                    </label>
+                                    <select name="gender" required class="form-control" id="gender">
+                                        <option value="" selected disabled>---------</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4 px-1">
+                                <div class="form-group">
+                                    <label>City
+                                        <span class="error_text" id="city_error_text"></span>
+                                        {% if form.city.errors %}
+                                            {{ form.city.errors|striptags|json_script:"city_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                            <div class="col-md-4 pl-1">
+                                <div class="form-group">
+                                    <label>Country
+                                        <span class="error_text" id="country_error_text"></span>
+                                        {% if form.country.errors %}
+                                            {{ form.country.errors|striptags|json_script:"country_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.country }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    {{ form.address }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Date of Birth
+                                        <span class="error_text" id="dob_error_text"></span>
+                                        {% if form.dob.errors %}
+                                            {{ form.dob.errors|striptags|json_script:"dob_error" }}
+                                        {% endif %}
+                                    </label>
+                                    <div class="input-group date">
+                                        {{ form.dob }}
+                                        <span class="input-group-addon">
+                                        <span class="input-group-text calender-icon">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </span>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="update ml-auto mr-auto">
+                                <button type="submit" class="btn btn-primary btn-round" id="submitBtn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+{% block add_new_js %}
+    <script src="{% static  '/user/js/user.custom.js' %}"></script>
+    <script>
+        function CheckBoxToRadio(selectorOfCheckBox, isUncheckable) {
+            $(selectorOfCheckBox).each(function () {
+                $(this).change(function () {
+                    var isCheckedThis = $(this).prop('checked');
+                    $(selectorOfCheckBox).prop('checked', false);
+                    if (isCheckedThis === true || isUncheckable === true) {
+                        $(this).prop('checked', true);
+                        $(this).val(true);
+                    }
+                });
+            });
+        }
+
+        $(document).ready(function () {
+            preventAutoFormSubmission();
+            CheckBoxToRadio(".checkbox-wrapper .radio");
+            $('#employeeForm').on('submit', function (e) {
+                e.preventDefault();
+                $('.radio').each(function () {
+                    var isCheckedThis = $(this).prop('checked');
+                    if (isCheckedThis == true) {
+                        if ($("#submitBtn").attr('attempted') == 'true') {
+                            e.preventDefault();
+                        } else {
+                            $("#submitBtn").attr("attempted", 'true');
+                            e.currentTarget.submit();
+                        }
+                    }
+                });
+
+            })
+        });
+    </script>
+{% endblock %}
+

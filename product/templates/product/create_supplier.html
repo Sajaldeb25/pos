@@ -1,0 +1,85 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/user/css/add_new_employee.css' %}" rel="stylesheet"/>
+    <form action="{% url 'product:new_supplier' %}" method="POST" enctype="multipart/form-data" id="supplierForm">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-user">
+                    <div class="card-header">
+                        <h5 class="card-title">Add new supplier</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Supplier Name
+                                        <span class="error_text" id="name_error_text"></span>
+                                        {% if form.name.errors %}
+                                            {{ form.name.errors|striptags|json_script:"name_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.name }}
+                                    {{ form.supplier_id }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Supplier mobile No
+                                        <span class="error_text" id="mobile_no_error_text"></span>
+                                        {% if form.mobile_no.errors %}
+                                            {{ form.mobile_no.errors|striptags|json_script:"mobile_no_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.mobile_no }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Supplier Address
+                                        <span class="error_text" id="address_error_text"></span>
+                                        {% if form.address.errors %}
+                                            {{ form.address.errors|striptags|json_script:"address_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.address }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="update ml-auto mr-auto">
+                                <button type="submit" class="btn btn-primary btn-round" id="submitBtn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% block add_new_js %}
+        <script src="{% static '/product/js/check_field_error.js' %}"></script>
+        <script>
+            $(document).ready(function () {
+                initDatatable();
+                preventAutoFormSubmission();
+                checkFieldError();
+                /*------------*/
+                $('#supplierForm').on('submit', function (e) {
+                    if ($("#submitBtn").prop('attempted') == 'true') {
+                        e.preventDefault();
+                    } else {
+                        $("#submitBtn").prop("attempted", 'true');
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+{% endblock %}
+

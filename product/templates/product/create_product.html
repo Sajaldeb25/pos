@@ -1,0 +1,298 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/user/css/add_new_employee.css' %}" rel="stylesheet"/>
+    <form action="{% url 'product:new_product' %}" method="POST" enctype="multipart/form-data" id="productFrom">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-user">
+                    <div class="card-header">
+                        <h5 class="card-title">Add new product</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-11">
+                                <div class="form-group">
+                                    <label>Product Name
+                                        <span class="error_text" id="product_name_error_text"></span>
+                                        {% if form.product.errors %}
+                                            {{ form.product.errors|striptags|json_script:"product_name_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.product }}
+                                    {{ form.new_product_name }}
+                                </div>
+                            </div>
+                            <div class="col-md-1 col-2 align-self-center pl-1 mt-2">
+                                <div class="row">
+                                    <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                         id="new_product"><i class="fa fa-plus"></i></btn>
+                                    <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                         id="cancel_product"><i class="fa fa-times-circle"></i></btn>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="product_description">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Product Description
+                                        <span class="error_text" id="product_description_error_text"></span>
+                                        {% if form.product_description.errors %}
+                                            {{ form.product_description.errors|striptags|json_script:"product_description_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.product_description }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Supplier
+                                        <span class="error_text" id="supplier_error_text"></span>
+                                        {% if form.supplier.errors %}
+                                            {{ form.supplier.errors|striptags|json_script:"supplier_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.supplier }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1">
+                                <div class="row">
+                                    <div class="col-md-11 col-10">
+                                        <div class="form-group">
+                                            <label for="category">
+                                                Category
+                                                <span class="error_text" id="category_error_text"></span>
+                                                <span class="success_text" id="category_success_text"
+                                                      style="color: green;"></span>
+                                                {% if form.category.errors %}
+                                                    {{ form.category.errors|striptags|json_script:"category_error" }}
+                                                {% endif %}
+                                            </label>
+                                            {{ form.category }}
+                                            {{ form.new_category }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 col-2 align-self-center pl-1 mt-2">
+                                        <div class="row">
+                                            <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                                 id="new_category"><i class="fa fa-plus"></i></btn>
+                                            <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                                 id="cancel_category"><i class="fa fa-times-circle"></i></btn>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-md-1">
+                                <div class="form-group">
+                                    <label for="gsm">GSM</label>
+                                    {{ form.gsm }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1">
+                                <div class="row">
+                                    <div class="col-md-11 col-10">
+                                        <div class="form-group">
+                                            <label for="color">
+                                                <span id="color_label">Color</span>
+                                                <span class="error_text" id="color_error_text"></span>
+                                                <span class="success_text" id="color_success_text"
+                                                      style="color: green;"></span>
+                                                {% if form.color.errors %}
+                                                    {{ form.color.errors|striptags|json_script:"color_error" }}
+                                                {% endif %}
+                                            </label>
+                                            {{ form.color }}
+                                            {{ form.new_color }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 col-2 align-self-center pl-1 mt-2">
+                                        <div class="row">
+                                            <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                                 id="new_color"><i class="fa fa-plus"></i></btn>
+                                            <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                                 id="cancel_color"><i class="fa fa-times-circle"></i></btn>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 pl-md-1">
+                                <div class="row">
+                                    <div class="col-md-11 col-10">
+                                        <div class="form-group">
+                                            <label for="size">
+                                                <span id="size_label">Size</span>
+                                                <span class="error_text" id="size_error_text"></span>
+                                                <span class="success_text" id="size_success_text"
+                                                      style="color: green;"></span>
+                                                {% if form.size.errors %}
+                                                    {{ form.size.errors|striptags|json_script:"size_error" }}
+                                                {% endif %}
+                                            </label>
+                                            {{ form.size }}
+                                            {{ form.new_size }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 col-2 align-self-center pl-1 mt-2">
+                                        <div class="row">
+                                            <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                                 id="new_size"><i class="fa fa-plus"></i></btn>
+                                            <btn class="btn btn-sm btn-outline-success btn-round btn-icon"
+                                                 id="cancel_size"><i class="fa fa-times-circle"></i></btn>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1">
+                                <div class="form-group">
+                                    <label>Purchase Price
+                                        <span class="error_text" id="bag_purchase_price_error_text"></span>
+                                        {% if form.bag_purchase_price.errors %}
+                                            {{ form.bag_purchase_price.errors|striptags|json_script:"bag_purchase_price_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.bag_purchase_price }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-md-1">
+                                <div class="form-group">
+                                    <label>Transport cost
+                                        <span class="error_text" id="transport_cost_error_text"></span>
+                                        {% if form.transport_cost.errors %}
+                                            {{ form.transport_cost.errors|striptags|json_script:"transport_cost_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.transport_cost }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1">
+                                <div class="form-group">
+                                    <label for="marketing_cost">Marketing cost
+                                        <span class="error_text" id="marketing_cost_error_text"></span>
+                                        {% if form.marketing_cost.errors %}
+                                            {{ form.marketing_cost.errors|striptags|json_script:"marketing_cost_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.marketing_cost }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-md-1">
+                                <div class="form-group">
+                                    <label>Vat
+                                        <span class="error_text" id="vat_error_text"></span>
+                                        {% if form.vat.errors %}
+                                            {{ form.vat.errors|striptags|json_script:"vat_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.vat }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1">
+                                <div class="form-group">
+                                    <label>Printing Cost
+                                        <span class="error_text" id="printing_error_text"></span>
+                                        {% if form.printing_cost.errors %}
+                                            {{ form.printing_cost.errors|striptags|json_script:"printing_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.printing_cost }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 pl-md-1">
+                                <div class="form-group">
+                                    <label>profit
+                                        <span class="error_text" id="profit_error_text"></span>
+                                        {% if form.profit.errors %}
+                                            {{ form.profit.errors|striptags|json_script:"profit_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.profit }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1">
+                                <div class="form-group">
+                                    <label>Discount(%)
+                                        <span class="error_text" id="discount_error_text"></span>
+                                        {% if form.discount_percent.errors %}
+                                            {{ form.discount_percent.errors|striptags|json_script:"discount_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.discount_percent }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-md-1">
+                                <div class="form-group">
+                                    <label>Discount Min Purchase(piece)
+                                        <span class="error_text" id="discount_min_purchase_error_text"></span>
+                                        {% if form.discount_min_purchase.errors %}
+                                            {{ form.discount_min_purchase.errors|striptags|json_script:"discount_min_purchase_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.discount_min_purchase }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Total Stock
+                                        <span class="error_text" id="stock_total_error_text"></span>
+                                        {% if form.stock_total.errors %}
+                                            {{ form.stock_total.errors|striptags|json_script:"stock_total_error" }}
+                                        {% endif %}
+                                    </label>
+                                    {{ form.stock_total }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="update ml-auto mr-auto">
+                                <button type="submit" class="btn btn-primary btn-round" id="submitBtn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% block add_new_js %}
+        <script src="{% static '/product/js/add_new_product.js' %}"></script>
+        <script>
+            $(document).ready(function () {
+                initDatatable();
+                preventAutoFormSubmission();
+                /*----------------------*/
+                initSize();
+                initColor();
+                initCategory();
+                initProduct();
+                checkProductFieldError();
+                $('#productForm').on('submit', function (e) {
+                    if ($("#submitBtn").prop('attempted') == 'true') {
+                        e.preventDefault();
+                    } else {
+                        $("#submitBtn").prop("attempted", 'true');
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+{% endblock %}
+

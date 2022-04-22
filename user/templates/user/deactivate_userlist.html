@@ -1,0 +1,127 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row product_list">
+        <div class="col col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title text-center text-md-left"> Deactivate employees </h4>
+                </div>
+                <hr/>
+                <div class="card-body">
+                    <div class="table-responsive product_list_table">
+                        <table class="table table-hover" id="product_list">
+                            <thead class=" text-primary">
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Phone1</th>
+                            <th>Phone2</th>
+                            <th>Position</th>
+                            <th>Total taken order</th>
+                            <th>Last Login</th>
+                            </thead>
+                            <tbody>
+                            {% for user in deactivate_employees %}
+                                <tr class="cursor-pointer user_row" data-id="{{ user.code }}"
+                                    onclick="redirect_new_page('{% url 'user:user_details' user.code %}')">
+                                    <td>{{ user.code }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.gender }}</td>
+                                    <td>{{ user.phone_no1 }}</td>
+                                    <td>{{ user.phone_no2 }}</td>
+                                    {% if user.is_superuser %}
+                                        <td>Super Admin</td>
+                                    {% elif user.is_admin %}
+                                        <td>Admin</td>
+                                    {% elif user.is_seller %}
+                                        <td>Seller</td>
+                                    {% else %}
+                                        <td>Not set</td>
+                                    {% endif %}
+                                    <td>{{ user.order_sold_by.count }}</td>
+                                    <td>{{ user.last_login|date:'d/m/Y h:i A' }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% csrf_token %}
+{% endblock %}
+{% block outside_wrapper %}
+    <ul class="ContextMenu ContextMenu--theme-default" id="contextMenu" data-contextmenu="0" tabindex="-1">
+        <li class="ContextMenu-item" tabindex="0" id="deleteBtn"
+            onclick="confirmDelete()" data-id data-delete-row>
+            <i class="fa fa-minus-circle context-menu-icon"></i>
+            <strong style="margin-left: 20px;">Delete</strong>
+        </li>
+    </ul>
+{% endblock %}
+{% block add_new_js %}
+    <script src="{% static  '/product/js/ajax_request.js' %}"></script>
+    <script>
+        function deactivateUserList() {
+            $('.user_row').on('contextmenu', function (e) {
+                e.preventDefault();
+                $('#contextMenu').css({
+                    top: e.pageY + 'px',
+                    left: e.pageX + 'px'
+                }).addClass('is-open');
+                var id = $(this).data('id');
+                $('#deleteBtn').data('id', id);
+                $('#deleteBtn').data('deleteRow', this);
+            })
+        }
+
+        function deleteEmployee() {
+            var id = $('#deleteBtn').data('id');
+            var deleteRow = $('#deleteBtn').data('deleteRow');
+            var dataTable = $('#product_list').DataTable();
+            $.ajax({
+                url: window.location.href,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                    dlt_user_code: id
+                },
+                success: function (data, textStatus, jqXHR) {
+                    dataTable.row($(deleteRow)).remove().draw();
+                    showToast('Successfully deleted', 'success');
+                },
+                error: function (data, textStatus, jqXHR) {
+                    var errors = data.responseJSON;
+                    if ('permission_denied' in errors) {
+                        showToast(errors.permission_denied, 'error');
+                    } else if ('employee_not_found' in errors) {
+                        showToast(errors.employee_not_found, 'error');
+                    } else {
+                        showToast('Error occurred while deleting employee', 'error');
+                    }
+
+                }
+            });
+        }
+
+        function confirmDelete() {
+            var action = confirm('Do you sure to delete this employee then all transaction with this employee will be deleted too?');
+            if (action) {
+                deleteEmployee();
+            }
+        }
+
+        $(document).ready(function () {
+            initDatatable();
+            preventAutoFormSubmission();
+            deactivateUserList();
+            /*------------*/
+            $(document).click(function () {
+                $('#contextMenu').removeClass('is-open');
+            });
+        });
+    </script>
+{% endblock %}

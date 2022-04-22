@@ -1,0 +1,291 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row product_list">
+        <div class="col col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-10 col-12 text-center text-md-left">
+                            <h5 class="card-title">Shareholders</h5>
+                        </div>
+                        {% if investor_form and invest_form and perms.investor.add_shareholder %}
+                            <div class="col-md-2 col-12 text-center">
+                                <button type="button"
+                                        class="btn btn-round min-width-120 btn-primary mr-2 float-md-right"
+                                        data-toggle="modal" data-target="#formModal" id="addBtn">
+                                    Add
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <hr style="margin:0px !important;">
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive product_list_table">
+                        <table class="table table-hover" id="product_list">
+                            <thead class=" text-primary">
+                            <th>Joining Date</th>
+                            <th>Name</th>
+                            <th>Phone No</th>
+                            <th>Address</th>
+                            <th>Total Invest(BDT)</th>
+                            </thead>
+                            <tbody id="investorListTbody">
+                            {% for investor in investors %}
+                                <tr class="investor_row cursor-pointer" data-id='{{ investor.id }}'
+                                    onclick="redirect_new_page('{% url 'investor:shareholder_details' investor.id %}')">
+                                    <td>{{ investor.joining_date|date:'d/m/Y' }}</td>
+                                    <td>{{ investor.name }}</td>
+                                    <td>{{ investor.phone_no }}</td>
+                                    <td>{{ investor.address }}</td>
+                                    <td>{{ investor.total_invest|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% csrf_token %}
+{% endblock %}
+{% block outside_wrapper %}
+    <!--Shareholder add modal -->
+    {% if perms.investor.add_shareholder %}
+        <div class="modal fade" id="formModal" tabindex="-1" role="dialog"
+             aria-labelledby="formModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="formModalLabel">Add new investor</h5>
+                    </div>
+                    <form method="post" id="form" data-edit="0">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Joining Date
+                                            <span class="error_text" id="joiningErrorTxt"></span>
+                                        </label>
+                                        <div class="input-group date">
+                                            {{ investor_form.joining_date }}
+                                            <span class="input-group-addon">
+                                                <span class="input-group-text calender-icon cursor-pointer" style="height: 100% !important;">
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Name
+                                            <span class="error_text" id="nameErrorTxt"></span>
+                                        </label>
+                                        {{ investor_form.name }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Phone No
+                                            <span class="error_text" id="phoneNoErrorTxt"></span>
+                                        </label>
+                                        {{ investor_form.phone_no }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Address
+                                        </label>
+                                        {{ investor_form.address }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Invest amount
+                                            <span class="error_text" id="amountErrorTxt"></span>
+                                        </label>
+                                        {{ invest_form.amount }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <!--Shareholder add modal End -->
+    {% if perms.investor.delete_shareholder %}
+        <ul class="ContextMenu ContextMenu--theme-default" id="contextMenu" data-contextmenu="0" tabindex="-1">
+            <li class="ContextMenu-item" tabindex="0" id="deleteBtn"
+                onclick="confirmRelease()" data-total-variant="0" data-id data-delete-row>
+                <i class="fa fa-minus-circle context-menu-icon"></i>
+                <strong style="margin-left: 20px;">Release</strong>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+{% block add_new_js %}
+    <script>
+        {% if perms.investor.add_shareholder %}
+            function showSpinner() {
+                $('#spinner').removeClass('display-none');
+                $('#save_btn_txt').addClass('display-none');
+            }
+            function hideSpinner() {
+                $('#spinner').addClass('display-none');
+                $('#save_btn_txt').removeClass('display-none');
+            }
+
+
+            function initAddForm() {
+                $('#addBtn').on('click', function () {
+                    $('#form').get(0).reset();
+                    $('input[name="name"]').removeClass('error_border');
+                    $('input[name="phone_no"]').removeClass('error_border');
+                    $('input[name="amount"]').removeClass('error_border');
+                    $('#nameErrorTxt').text('');
+                    $('#phoneNoErrorTxt').text('');
+                    $('#amountErrorTxt').text('');
+                });
+            }
+
+            function submitForm() {
+                $('#form').on('submit', function (e) {
+                    e.preventDefault();
+                    showSpinner();
+                    $.ajax({
+                        url: window.location.href,
+                        type: 'POST',
+                        data: $('#form').serialize(),
+                        success: function (data, textStatus, jqXHR) {
+                            showToast('Successfully created', 'success');
+                            hideSpinner();
+                            var dataTable = $('#product_list').DataTable();
+                            var newNode = dataTable.row.add([data.joining_date, data.name, data.phone_no, data.address, $('input[name="amount"]').val()]).draw().node();
+                            $(newNode).data('id', data.id);
+                            $(newNode).addClass('investor_row cursor-pointer');
+                            $(newNode).attr('data-id', data.id);
+                            $('#formModal').modal('toggle');
+                        },
+                        error: function (data, textStatus, jqXHR) {
+                            var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                            if ('permission_denied' in errors) {
+                                showToast(errors.permission_denied, 'error');
+                                errors = [{'error': ''}, {'error2': ''}];
+                            } else {
+                                showToast('Error occurred while creating', 'error');
+                            }
+                            if ('name' in errors[0]) {
+                                $('#nameErrorTxt').text(errors[0].name[0]);
+                                $('input[name="name"]').addClass('error_border');
+                            }
+                            if ('phone_no' in errors[0]) {
+                                $('#phoneNoErrorTxt').text(errors[0].phone_no[0])
+                                $('input[name="phone_no"]').addClass('error_border');
+                            }
+                            if ('amount' in errors[1]) {
+                                $('#amountErrorTxt').text(errors[1].amount[0]);
+                                $('input[name="amount"]').addClass('error_border');
+                            }
+                            hideSpinner();
+                        }
+                    });
+                })
+            }
+        {% endif %}
+        {% if perms.investor.delete_shareholder %}
+            function investorListContextMenu() {
+                $('.investor_row').on('contextmenu', function (e) {
+                    e.preventDefault();
+                    $('#contextMenu').css({
+                        top: e.pageY + 'px',
+                        left: e.pageX + 'px'
+                    }).addClass('is-open');
+                    var id = $(this).data('id');
+                    $('#deleteBtn').data('id', id);
+                    $('#deleteBtn').data('deleteRow', this);
+                })
+            }
+
+            function releaseInvestor() {
+                var id = $('#deleteBtn').data('id');
+                var deleteRow = $('#deleteBtn').data('deleteRow');
+                var dataTable = $('#product_list').DataTable();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                        dlt_id: id
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        dataTable.row($(deleteRow)).remove().draw();
+                        showToast('Successfully deleted', 'success');
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        var errors = data.responseJSON;
+                        if ('permission_denied' in errors) {
+                            showToast(errors.permission_denied, 'error');
+                        } else {
+                            showToast('Error occurred while releasing', 'error');
+                        }
+                    }
+                });
+            }
+
+            function confirmRelease() {
+                var action = confirm('Do you sure to release the shareholder?');
+                if (action) {
+                    releaseInvestor();
+                }
+            }
+        {% endif %}
+
+        $(document).ready(function () {
+            initDatatable();
+            preventAutoFormSubmission();
+            $('[data-toggle="datepicker"]').datepicker({
+                autoHide: true,
+                format: 'dd/mm/yyyy',
+                zIndex: 2048,
+            });
+            {% if perms.investor.add_shareholder %}
+                initAddForm();
+                submitForm();
+            {% endif %}
+
+            /*----------------------*/
+            {% if perms.investor.delete_shareholder %}
+                investorListContextMenu();
+                $(document).click(function () {
+                    $('#contextMenu').removeClass('is-open');
+                });
+            {% endif %}
+        });
+    </script>
+{% endblock %}
+

@@ -1,0 +1,791 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block content %}
+    <link href="{% static '/user/css/add_new_employee.css' %}" rel="stylesheet"/>
+    <form method="POST" enctype="multipart/form-data" id="employeeForm">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-user">
+                    <div class="image">
+                        <img src="{% static '/common/img/damir-bosnjak.jpg' %}" alt="...">
+                    </div>
+                    <div class="card-body min-height-auto">
+                        <div class="author">
+                            <a style="color:#51cbce !important;">
+                                <img onclick="$('#img_input').click()" class="avatar border-gray" id="img_preview"
+                                     src="{% if user_details.profile_pic %}{{ user_details.profile_pic.url }} {% else %} {% static '/common/img/mike.jpg' %} {% endif %}"
+                                     alt="...">
+                                <input type="file" name="profile_pic" id="img_input" hidden="" accept="image/*"
+                                       disabled>
+                                <h5 class="title" id="username">{{ user_details.name }}</h5>
+                            </a>
+                            <p class="description">
+                                {{ user_details.code }}
+                                <span id="positionTxt">
+                                    ({% if user_details.is_superuser %}
+                                    Superuser
+                                {% elif user_details.is_admin %}
+                                    Admin
+                                {% else %}
+                                    Seller
+                                {% endif %})
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <hr>
+                        <div class="button-container">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6 col-6 ml-auto">
+                                    <h5>{{ user_details.orders|length }}
+                                        <br>
+                                        <small>Orders</small>
+                                    </h5>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-6 ml-auto mr-auto">
+                                    <h5>{{ user_details.total_order_item }}
+                                        <br>
+                                        <small>Items</small>
+                                    </h5>
+                                </div>
+                                <div class="col-lg-3 mr-auto">
+                                    <h5>{{ user_details.total_order_billed|floatformat:2 }}
+                                        <br>
+                                        <small>Billed(BDT)</small>
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if user.code != user_details.code %}
+                        <div class="row" id="accountDltBtn">
+                            <div class="update ml-auto mr-auto">
+                                <button type="button"
+                                        class="btn btn-round {% if not user_details.is_active %}display-none{% endif %}"
+                                        id="deactivateBtn"
+                                        style="background: #dc3545;">
+                                    <div class="spinner-grow display-none" role="status"
+                                         style="color:yellow;" id="deactivateSpinner">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <span id="deactivateBtnTxt">Deactivate</span>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-round {% if user_details.is_active %}display-none{% endif %}"
+                                        id="activateBtn"
+                                        style="background: #28a745;">
+                                    <div class="spinner-grow display-none" role="status"
+                                         style="color:yellow;" id="activateSpinner">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <span id="activateBtnTxt">Activate</span>
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="display-none" id="position">
+                        <div class="permission-title">
+                            <h6>Position</h6>
+                        </div>
+                        <div class="checkbox-wrapper" style="margin: 15px;">
+                            {% if perms.can_promote_superuser %}
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" name="is_superuser" class="form-check-input radio"
+                                               id="id_is_superuser">
+                                        <span class="form-check-sign"></span>
+                                        Super user
+                                    </label>
+                                </div>
+                            {% endif %}
+                            {% if perms.promote_admin %}
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" name="is_admin" class="form-check-input radio"
+                                               id="id_is_admin">
+                                        <span class="form-check-sign"></span>
+                                        Admin
+                                    </label>
+                                </div>
+                            {% endif %}
+                            <div class="form-check" style="position: relative !important;">
+                                <label class="form-check-label">
+                                    <input type="checkbox" name="is_seller" class="form-check-input radio"
+                                           id="id_is_seller">
+                                    <span class="form-check-sign"></span>
+                                    Staff
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card card-user">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-12 col-md-6 text-center text-md-left">
+                                <h5 class="card-title">Employee Info</h5>
+                            </div>
+                            <div class="col-12 col-md-6 text-center">
+                                <div class="d-flex flex-row justify-content-md-end justify-content-center"
+                                     style="margin: 0 5px;">
+                                    {% if user.is_admin or user.is_superuser or user.code == user_details.code %}
+                                        <button type="button" class="btn btn-primary btn-round" data-toggle="modal"
+                                                data-target="#passChangeModal" id="changePassBtn">Change Password
+                                        </button>
+                                    {% endif %}
+                                    {% if user.is_admin or user.is_superuser %}
+                                        <div class="editBtnWrapper" style="margin: 0 5px;">
+                                            <button type="button" class="btn btn-primary btn-round" id="editBtn">Edit
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-round display-none"
+                                                    id="cancelBtn">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="card-body">
+                        <!--                <form>-->
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1 display-none" id="nameColumn">
+                                <div class="form-group">
+                                    <label>Full Name
+                                        <span class="error_text" id="name_error_text"></span>
+                                    </label>
+                                    <input type="text" name="name" class="form-control" id="fullname"
+                                           placeholder="Full Name" oninput="showName()" autofocus="" required=""
+                                           maxlength="255" value="{{ user_details.name }}">
+                                </div>
+                            </div>
+                            <div class="col-12" id="emailColumn">
+                                <div class="form-group">
+                                    <label for=email">
+                                        Email <span class="error_text" id="email_error_text"></span>
+                                    </label>
+                                    <input type="email" name="email" class="form-control input-text"
+                                           maxlength="255" id="id_email" value="
+
+
+
+
+
+
+
+
+
+
+
+                                            {% if not user.details.email %}{% else %}{{ user_details.email }}{% endif %}"
+                                           disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1 col-12">
+                                <div class="form-group">
+                                    <label>Phone No 1
+                                        <span class="error_text" id="phone_no1_error_text"></span>
+                                    </label>
+                                    <input type="number" name="phone_no1" class="form-control input-text"
+                                           placeholder="Phone no 1"
+                                           maxlength="11" required="" id="id_phone_no1"
+                                           value="{{ user_details.phone_no1 }}" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-md-1">
+                                <div class="form-group">
+                                    <label for=email">
+                                        Phone no2 <span class="error_text" id="phone_no2_error_text"></span>
+                                    </label>
+                                    <input type="number" name="phone_no2" class="form-control input-text"
+                                           placeholder="Phone no 2"
+                                           maxlength="11" id="id_phone_no2" value="{{ user_details.phone_no2 }}"
+                                           disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>NID
+                                        <span class="error_text" id="nid_error_text"></span>
+                                    </label>
+                                    <input type="number" name="nid" class="form-control input-text" placeholder="NID"
+                                           required=""
+                                           maxlength="30" id="id_nid" value="{{ user_details.nid }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 pr-md-1">
+                                <div class="form-group">
+                                    <label for="gender">Gender
+                                        <span class="error_text" id="gender_error_text"></span>
+                                    </label>
+                                    <div class="form-control input-text" id="genderTxt">{{ user_details.gender }}</div>
+                                    <select name="gender" required class="form-control display-none" id="gender">
+                                        <option value="" disabled>---------</option>
+                                        <option value="Male" {% if user_details.gender == 'Male' %}
+                                                selected {% endif %}>Male
+                                        </option>
+                                        <option value="Female" {% if user_details.gender == 'Female' %}
+                                                selected {% endif %}>Female
+                                        </option>
+                                        <option value="Other" {% if user_details.gender == 'Other' %}
+                                                selected {% endif %}>Other
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4 px-md-1">
+                                <div class="form-group">
+                                    <label>City
+                                        <span class="error_text" id="city_error_text"></span>
+                                    </label>
+                                    <input type="text" name="city" class="form-control input-text" placeholder="City"
+                                           required=""
+                                           maxlength="30" id="id_city" value="{{ user_details.city }}" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-4 pl-md-1">
+                                <div class="form-group">
+                                    <label>Country
+                                        <span class="error_text" id="country_error_text"></span>
+                                    </label>
+                                    <input type="text" name="country" class="form-control input-text"
+                                           placeholder="Country" required="" maxlength="30" id="id_country"
+                                           value="{{ user_details.country }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <textarea type="text" name="address" class="form-control input-text"
+                                              style="padding-left: 10px;"
+                                              placeholder="Address" required="" maxlength="255" id="id_address"
+                                              disabled>{{ user_details.address }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Date of Birth
+                                        <span class="error_text" id="dob_error_text"></span>
+                                    </label>
+                                    <div class="input-group date">
+                                        <input type="text" name="dob" class="form-control input-text" placeholder="DOB"
+                                               id="datepicker" data-select="datepicker" readonly="" required=""
+                                               autocomplete="off" value="{{ user_details.dob|date:'d/m/Y' }}" disabled>
+                                        <span class="input-group-addon">
+                                        <span class="input-group-text calender-icon">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </span>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row display-none" id="submitBtnRow">
+                            <div class="update ml-auto mr-auto">
+                                <button type="submit" class="btn btn-primary btn-round" id="submitBtn">
+                                    <div class="spinner-grow display-none" role="status"
+                                         style="color:yellow;" id="spinner">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <span id="save_btn_txt">Save</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <!--Order history-->
+                <div class="card card-user">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-12 col-md-12 text-center text-md-left">
+                                <h5 class="card-title">Order Taken History</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row pt-2">
+                            <div class="col-12">
+                                <div class="table-responsive table_outside_border">
+                                    <table class="table table-hover" id="product_list">
+                                        <thead class="text-primary">
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Total Item</th>
+                                        <th>Total Billed</th>
+                                        <th>Total Paid</th>
+                                        <th>Total Due</th>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in user_details.orders %}
+                                            <tr>
+                                                <td onclick="redirect_new_page('{% url 'product:order_details' item.id %}')"
+                                                    class="hover-active cursor-pointer">
+                                                    {{ item.id }}
+                                                </td>
+                                                <td>{{ item.ordered_date|date:'d/m/Y h:i A' }}</td>
+                                                <td>{{ item.total_item }}</td>
+                                                <td>{{ item.total_billed|floatformat:2 }}</td>
+                                                <td>{{ item.total_paid|floatformat:2 }}</td>
+                                                <td>{{ item.total_due|floatformat:2 }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Order history end-->
+            </div>
+        </div>
+    </form>
+{% endblock %}
+{% block outside_wrapper %}
+    {% if user.is_admin or user.is_superuser or user.code == user_details.code %}
+        <!--Password Modal-->
+        <form method="post" id="passChangeForm">
+            <div class="modal fade" id="passChangeModal" tabindex="-1" role="dialog"
+                 aria-labelledby="passChangeModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Change password</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Your password
+                                    <span class="error_text" id="odlPassErrorTxt"></span>
+                                </label>
+                                <input type="password" name="old_password" class="form-control" required=""
+                                       maxlength="30"
+                                       id="passwordInput">
+                            </div>
+                            <div class="form-group">
+                                <label>New password
+                                    <span class="error_text" id="newPassErrorTxt"></span>
+                                </label>
+                                <input type="password" name="new_password" class="form-control" required=""
+                                       minlength="6"
+                                       maxlength="30"
+                                       id="newPasswordInput">
+                            </div>
+                            <div class="form-group">
+                                <label>Re type password
+                                    <span class="error_text" id="rePassErrorTxt"></span>
+                                </label>
+                                <input type="password" name="retype_password" class="form-control" required=""
+                                       minlength="6"
+                                       maxlength="30" id="rePasswordInput">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-round" data-dismiss="modal">Close
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-round" id="changePassSubmitBtn">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="passSpinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="passBtnTxt">Save</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!--End Password Modal-->
+    {% endif %}
+{% endblock %}
+{% block add_new_js %}
+    <script src="{% static  '/user/js/user.custom.js' %}"></script>
+    <script>
+        {% if user.is_admin or user.is_superuser %}
+            function showSpinner() {
+                $('#spinner').removeClass('display-none');
+                $('#save_btn_txt').addClass('display-none');
+            }
+
+            function hideSpinner() {
+                $('#spinner').addClass('display-none');
+                $('#save_btn_txt').removeClass('display-none');
+            }
+
+            function initEmployeeInfo() {
+                window.name = '{{ user_details.name }}';
+                window.email = '{{ user_details.email }}';
+                window.phone_no1 = '{{ user_details.phone_no1 }}';
+                window.phone_no2 = '{{ user_details.phone_no2 }}';
+                window.address = '{{ user_details.address }}';
+                window.nid = '{{ user_details.nid }}';
+                window.country = '{{ user_details.country }}';
+                window.city = '{{ user_details.city }}';
+                window.dob = '{{ user_details.dob|date:'d/m/Y' }}';
+                window.gender = '{{ user_details.gender }}';
+                {% if user_details.profile_pic %}
+                    window.profile_pic = '{{ user_details.profile_pic.url }}';
+                {% else %}
+                    window.profile_pic = '';
+                {% endif %}
+                window.is_active = '{{ user_details.is_active }}';
+                window.is_superuser = '{{ user_details.is_superuser }}';
+                window.is_seller = '{{ user_details.is_seller }}';
+                window.is_admin = '{{ user_details.is_admin }}';
+            }
+
+            function initFormValue() {
+                $('#employeeForm input').each(function () {
+                    var inputName = $(this).attr('name');
+                    if (inputName != 'profile_pic' && inputName != 'csrfmiddlewaretoken') {
+                        $(this).val(window[inputName]);
+                        $(this).removeClass('error_border');
+                        if (inputName == 'is_admin' && window[inputName] == 'True') {
+                            $(this).prop('checked', true);
+                        }
+                        if (inputName == 'is_superuser' && window[inputName] == 'True') {
+                            $(this).prop('checked', true);
+                        }
+                        if (inputName == 'is_seller' && window[inputName] == 'True') {
+                            $(this).prop('checked', true);
+                        }
+                    }
+                });
+                $('#employeeForm select').val(window[$('form select').attr('name')]);
+                $('#employeeForm textarea').val(window[$('form textarea').attr('name')]);
+                if (window.profile_pic != '' && window.profile_pic) {
+                    $('#img_preview').attr('src', window.profile_pic);
+                }
+                $('#genderTxt').text(window[$('form select').attr('name')]);
+
+                $('#name_error_text').text('');
+                $('#email_error_text').text('');
+                $('#phone_no1_error_text').text('');
+                $('#phone_no2_error_text').text('');
+                $('#gender_error_text').text('');
+                $('#country_error_text').text('');
+                $('#city_error_text').text('');
+                $('#dob_error_text').text('');
+            }
+
+            function CheckBoxToRadio(selectorOfCheckBox, isUncheckable) {
+                $(selectorOfCheckBox).each(function () {
+                    $(this).change(function () {
+                        var isCheckedThis = $(this).prop('checked');
+                        $(selectorOfCheckBox).prop('checked', false);
+
+                        if (isCheckedThis === true || isUncheckable === true) {
+                            $(this).prop('checked', true);
+                            $(this).val(true);
+                        }
+                    });
+                });
+            }
+
+            function editEmployee() {
+                if ($('#submitBtn').prop('attempted') != true) {
+                    $('#submitBtn').prop('attempted', true);
+                    showSpinner();
+                    var formData = new FormData(employeeForm);
+                    if ('{{ user.code }}' == '{{ user_details.code }}') {
+                        formData.append('is_super_user', '{{ user_details.is_superuser }}');
+                        formData.append('is_admin', '{{ user_details.is_admin }}');
+                        formData.append('is_seller', '{{ user_details.is_seller }}');
+                    }
+                    $.ajax({
+                        url: window.location.href,
+                        type: 'POST',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (data, textStatus, jqXHR) {
+                            $('#submitBtn').prop('attempted', false);
+                            hideSpinner();
+                            data = JSON.parse(data);
+                            window.name = data.name;
+                            window.email = data.email;
+                            window.phone_no1 = data.phone_no1;
+                            window.phone_no2 = data.phone_no2;
+                            window.address = data.address;
+                            window.nid = data.nid;
+                            window.country = data.country;
+                            window.city = data.city;
+                            window.dob = data.dob;
+                            window.gender = data.gender;
+                            window.profile_pic = data.profile_pic;
+                            window.is_active = data.is_active;
+                            window.is_superuser = data.is_superuser;
+                            window.is_seller = data.is_seller;
+                            window.is_admin = data.is_admin;
+                            if(data.is_admin){
+                                $('#positionTxt').text('Admin');
+                            }
+                            else if(data.is_superuser){
+                                 $('#positionTxt').text('Superuser');
+                            }
+                            else{
+                                $('#positionTxt').text('Seller');
+                            }
+                            showToast('Successfully updated', 'success');
+                            $('#cancelBtn').click();
+                        },
+                        error: function (data, textStatus, jqXHR) {
+                            $('#submitBtn').prop('attempted', false);
+                            hideSpinner();
+                            errors = data.responseJSON;
+                            if ('phone_no1' in errors) {
+                                var phoneNo1Error = errors.phone_no1[0];
+                                $('#phone_no1_error_text').text(phoneNo1Error);
+                                $('input[name="phone_no1"]').addClass('error_border');
+                            }
+                            if ('phone_no2' in errors) {
+                                var phoneNo2Error = errors.phone_no2[0];
+                                $('#phone_no2_error_text').text(phoneNo2Error);
+                                $('input[name="phone_no1"]').addClass('error_border');
+                            }
+                            if ('name' in errors) {
+                                var nameError = errors.name[0];
+                                $('#name_error_text').text(nameError);
+                                $('input[name="name"]').addClass('error_border');
+                            }
+                            if ('email' in errors) {
+                                var emailError = errors.email[0];
+                                $('#email_error_text').text(emailError);
+                                $('input[name="email"]').addClass('error_border');
+                            }
+                            if ('gender' in errors) {
+                                var genderError = errors.gender[0];
+                                $('#gender_error_text').text(genderError);
+                                $('select[name="gender"]').addClass('error_border');
+                            }
+                            if ('country' in errors) {
+                                var countryError = errors.country[0];
+                                $('#country_error_text').text(countryError);
+                                $('input[name="country"]').addClass('error_border');
+                            }
+                            if ('dob' in errors) {
+                                var dobError = errors.dob[0];
+                                $('#dob_error_text').text(dob);
+                                $('input[name="dob"]').addClass('error_border');
+                            }
+                            if ('city' in errors) {
+                                var cityError = errors.city[0];
+                                $('#city_error_text').text(cityError);
+                                $('input[name="city"]').addClass('error_border');
+                            }
+                            showToast('Error occurred while updating', 'error');
+                        }
+                    });
+                }
+
+            }
+        {% endif %}
+
+        $(document).ready(function () {
+            preventAutoFormSubmission();
+            initDatatable();
+            {% if user.is_superuser or urser.is_admin %}
+                initEmployeeInfo();
+                CheckBoxToRadio(".checkbox-wrapper .radio");
+                /*----------------------*/
+                $('#editBtn').on('click', function (e) {
+                    initFormValue();
+                    $('#employeeForm input').each(function () {
+                        var inputName = $(this).attr('name');
+                        if (inputName != 'profile_pic' && inputName != 'csrfmiddlewaretoken') {
+                            $(this).prop('disabled', false);
+                            $(this).removeClass('input-text');
+                        } else {
+                            $(this).prop('disabled', false);
+                        }
+                    });
+                    $('#employeeForm select').removeClass('display-none error_text');
+                    $('#employeeForm select').prop('disabled', false);
+                    $('#employeeForm textarea').removeClass('input-text');
+                    $('#employeeForm textarea').prop('disabled', false);
+                    $('#genderTxt').addClass('display-none');
+                    if ('{{ user.code }}' != '{{ user_details.code }}') {
+                        $('#position').removeClass('display-none');
+                    }
+                    $('#submitBtnRow').removeClass('display-none');
+                    $('#editBtn').addClass('display-none');
+                    $('#cancelBtn').removeClass('display-none');
+                    $('#emailColumn').addClass('col-md-6 pl-md-1');
+                    $('#nameColumn').removeClass('display-none');
+                    $('#accountDltBtn').addClass('display-none');
+                });
+                $('#cancelBtn').on('click', function (e) {
+                    initFormValue();
+                    $('#employeeForm input').each(function () {
+                        var inputName = $(this).attr('name');
+                        if (inputName != 'profile_pic' && inputName != 'csrfmiddlewaretoken') {
+                            $(this).prop('disabled', true);
+                            $(this).addClass('input-text');
+                        } else {
+                            $(this).prop('disabled', true);
+                        }
+                    });
+                    $('#emailColumn').removeClass('col-md-6 pl-md-1');
+                    $('#nameColumn').addClass('display-none');
+                    $('#employeeForm textarea').addClass('input-text');
+                    $('#employeeForm textarea').prop('disabled', true);
+                    $('#employeeForm select').addClass('display-none');
+                    $('#genderTxt').removeClass('display-none');
+                    $('#position').addClass('display-none');
+                    $('#submitBtnRow').addClass('display-none');
+                    $('#editBtn').removeClass('display-none');
+                    $('#cancelBtn').addClass('display-none');
+                    $('#accountDltBtn').removeClass('display-none');
+
+                });
+                $('#employeeForm').on('submit', function (e) {
+                    e.preventDefault();
+                    if ('{{ user.code }}' == '{{ user_details.code }}') {
+                        editEmployee();
+                    } else {
+                        $('.radio').each(function () {
+                            var isCheckedThis = $(this).prop('checked');
+                            if (isCheckedThis == true) {
+                                editEmployee();
+                                return false;
+                            }
+                        });
+                    }
+                });
+
+                $('#deactivateBtn').on('click', function (e) {
+                    if ($('#deactivateBtn').prop('attempted') != true) {
+                        $('#deactivateSpinner').removeClass('display-none');
+                        $('#deactivateBtnTxt').addClass('display-none');
+                        $('#deactivateBtn').prop('attempted', true);
+                        $.ajax({
+                            url: window.location.href,
+                            type: 'POST',
+                            data: {
+                                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                                dlt_code: '{{ user_details.code }}'
+                            },
+                            success: function (data, textStatus, jqXHR) {
+                                $('#deactivateSpinner').addClass('display-none');
+                                $('#deactivateBtnTxt').removeClass('display-none');
+                                $('#deactivateBtn').prop('attempted', false);
+                                showToast('Deactivated', 'success');
+                                $('#deactivateBtn').addClass('display-none');
+                                $('#activateBtn').removeClass('display-none');
+                            },
+                            error: function (data, textStatus, jqXHR) {
+                                $('#deactivateSpinner').addClass('display-none');
+                                $('#deactivateBtnTxt').removeClass('display-none');
+                                $('#deactivateBtn').prop('attempted', false);
+                                showToast('Deactivation error', 'error');
+                            }
+                        });
+                    }
+                });
+
+                $('#activateBtn').on('click', function (e) {
+                    if ($('#activateBtn').prop('attempted') != true) {
+                        $('#activateBtn').prop('attempted', true);
+                        $('#activateSpinner').removeClass('display-none');
+                        $('#activateBtnTxt').addClass('display-none');
+                        $.ajax({
+                            url: window.location.href,
+                            type: 'POST',
+                            data: {
+                                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                                act_code: '{{ user_details.code }}'
+                            },
+                            success: function (data, textStatus, jqXHR) {
+                                $('#activateSpinner').addClass('display-none');
+                                $('#activateBtnTxt').removeClass('display-none');
+                                showToast('Activate', 'success');
+                                $('#deactivateBtn').removeClass('display-none');
+                                $('#activateBtn').addClass('display-none');
+                                $('#activateBtn').prop('attempted', false);
+                            },
+                            error: function (data, textStatus, jqXHR) {
+                                $('#activateSpinner').addClass('display-none');
+                                $('#activateBtnTxt').removeClass('display-none');
+                                showToast('Activation error', 'error');
+                                $('#activateBtn').prop('attempted', false);
+                            }
+                        });
+                    }
+
+                });
+            {% endif %}
+            {% if user.is_superuser or user.is_admin or user.code == user_details.code %}
+                $('#changePassBtn').on('click', function () {
+                    $('#rePassErrorTxt').text('');
+                    $('#newPasswordInput').removeClass('error-border');
+                    $('#rePasswordInput').removeClass('error-border');
+                    $('#passChangeForm')[0].reset();
+                });
+
+                $('#passChangeForm').on('submit', function (e) {
+                    e.preventDefault();
+                    if ($('#newPasswordInput').val() == $('#rePasswordInput').val()) {
+                        $('#rePassErrorTxt').text('');
+                        $('#newPasswordInput').removeClass('error-border');
+                        $('#rePasswordInput').removeClass('error-border');
+                        if ($("#changePassSubmitBtn").attr('attempted') != true) {
+                            $("#changePassSubmitBtn").attr("attempted", 'true');
+                            $('#passSpinner').removeClass('display-none');
+                            $('#passBtnTxt').addClass('display-none');
+                            $.ajax({
+                                url: window.location.href,
+                                type: 'POST',
+                                data: {
+                                    csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                                    pass_user_code: '{{ user_details.code }}',
+                                    old_password: $('#passwordInput').val(),
+                                    new_password: $('#newPasswordInput').val()
+                                },
+                                success: function (data, textStatus, jqXHR) {
+                                    $('#passSpinner').addClass('display-none');
+                                    $('#passBtnTxt').removeClass('display-none');
+                                    $('#changePassSubmitBtn').prop('attempted', false);
+                                    showToast('password successfully changed', 'success');
+                                    $('#passChangeModal').modal('toggle');
+                                },
+                                error: function (data, textStatus, jqXHR) {
+                                    $('#passSpinner').addClass('display-none');
+                                    $('#passBtnTxt').removeClass('display-none');
+                                    $('#changePassSubmitBtn').prop('attempted', false);
+                                    var errors = data.responseJSON;
+                                    showToast(errors, 'error');
+                                }
+                            });
+                        }
+                    } else {
+                        $('#rePassErrorTxt').text('Password does\'nt match');
+                        $('#newPasswordInput').addClass('error-border');
+                        $('#rePasswordInput').addClass('error-border');
+                    }
+                });
+            {% endif %}
+        });
+    </script>
+{% endblock %}
+

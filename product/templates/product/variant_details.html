@@ -1,0 +1,791 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% block outside_wrapper %}
+    {% if perms.product.change_product and perms.product.change_productvariant %}
+        <!-- New stock Modal -->
+        <div class="modal fade" id="newStockModal" tabindex="-1" role="dialog"
+             aria-labelledby="newStockModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newStockModalLabel">Add new stock</h5>
+                    </div>
+                    <div class="display-none" id="newStockErrorBlock" style="padding-top: 10px;">
+                        <hr style="margin: 0px !important;">
+                    </div>
+                    <form method="post" id="newStockForm">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            New stock
+                                        </label>
+                                        {{ new_stock_form.new_stock }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Per product purchase price
+                                        </label>
+                                        {{ new_stock_form.per_product_purchase_price }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Select Supplier</label>
+                                        {{ new_stock_form.supplier }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--New stock End-->
+        <!-- The Product edit Modal -->
+        <div class="modal fade" id="productEditModal" tabindex="-1" role="dialog"
+             aria-labelledby="supplierEditModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="supplierEditModalLabel">Edit Product
+                            info</h5>
+                    </div>
+                    <form method="post" id="productForm">
+                        {% csrf_token %}
+                        {{ product_form.is_product_edited }}
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Product Name
+                                            <span class="error_text" id="product_name_error_text"></span>
+                                        </label>
+                                        {{ product_form.product_name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Product Description</label>
+                                        {{ product_form.product_description }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--The Product edit End-->
+
+        <!-- The variant edit Modal -->
+        <div class="modal fade" id="variantEditModal" tabindex="-1" role="dialog"
+             aria-labelledby="variantEditModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="variantEditModalLabel">Edit Variant
+                            info</h5>
+                    </div>
+                    <div class="display-none" id="errorBlock" style="padding-top: 10px;">
+                        <hr style="margin: 0px !important;">
+                    </div>
+
+                    <form method="post" class="modal-body" id="variantForm">
+                        {% csrf_token %}
+                        {{ variant_form.is_variant_edited }}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Gsm</label>
+                                    {{ variant_form.gsm }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Category
+                                        <span class="error_text"
+                                              id="category_error_text"></span>
+                                    </label>
+                                    {{ variant_form.category }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Size</label>
+                                    {{ variant_form.size }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Color</label>
+                                    {{ variant_form.color }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Purchase Price</label>
+                                    {{ variant_form.bag_purchase_price }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Marketing Cost</label>
+                                    {{ variant_form.marketing_cost }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Transport Cost</label>
+                                    {{ variant_form.transport_cost }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Printing Cost</label>
+                                    {{ variant_form.printing_cost }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Vat</label>
+                                    {{ variant_form.vat }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Profit</label>
+                                    {{ variant_form.profit }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Discount(%)</label>
+                                    {{ variant_form.discount_percent }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Discount min purchase</label>
+                                    {{ variant_form.discount_min_purchase }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Total Stock</label>
+                                    {{ variant_form.stock_total }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-round btn-secondary"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-round btn-primary"
+                                    style="min-width: 78px;">
+                                <div class="spinner-grow display-none" role="status"
+                                     style="color:yellow;" id="spinner">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="save_btn_txt">Save</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--The variant edit End-->
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <link href="{% static '/product/css/product.css' %}" rel="stylesheet"/>
+    <div class="row">
+        <div class="col-md-12">
+            <!--Product Info -->
+            <div class="card card-user">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-10 col-12 text-center text-md-left">
+                            <h5 class="card-title">Product no- {{ variant_details.product.id }}</h5>
+                        </div>
+                        {% if product_form and perms.product.change_product %}
+                            <div class="col-md-2 col-12">
+                                <button type="button"
+                                        class="btn btn-round min-width-120 btn-primary mr-2 float-md-right"
+                                        data-toggle="modal" data-target="#productEditModal" id="product_edit_btn">
+                                    Edit
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <hr style="margin:0px !important;">
+                </div>
+                <!--card header end -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="category">Product Name</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="productNameTxt" value="{{ variant_details.product.product_name }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="product_description">Product Description</label>
+                                <textarea type="text" disabled class="form-control input-text"
+                                          id="productDescriptionTxt">{{ variant_details.product.product_description }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--Product Info end -->
+
+            <!--Variant Info -->
+            <div class="card card-user">
+                <div class="card-header">
+                    <nav class="navbar navbar-expand-lg navbar-light justify-content-between"
+                         style="border-bottom: 1px solid gray">
+                        <a class="navbar-brand" style="color: inherit !important;">Variant
+                            no- {{ variant_details.id }}</a>
+                        {% if perms.product.change_productvariant %}
+                            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                                    data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02"
+                                    aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+
+                            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                                <div class="mr-auto"></div>
+                                <div class="navbar-right text-center">
+                                    <button type="button" class="btn btn-round btn-primary  min-width-120 my-2 my-sm-0"
+                                            data-toggle="modal" data-target="#newStockModal" id="newStockbtn">
+                                        New stock
+                                    </button>
+                                    <button type="button" class="btn btn-round btn-primary min-width-120 my-2 my-sm-0"
+                                            data-toggle="modal" data-target="#variantEditModal" id="variantEditBtn">
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </nav>
+                </div>
+                <!--card header end -->
+                <div class="card-body">
+                    <!--Sub Section -->
+                    <div class="row">
+                        <div class="col-md-6 col-12 pr-md-1">
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="categoryTxt" value="{{ variant_details.category }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12 pl-md-1">
+                            <div class="form-group">
+                                <label for="category">Gsm</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="gsmTxt" value="{{ variant_details.gsm }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Sub section end-->
+
+                    <!--Sub section-->
+                    <div class="row">
+                        <div class="col-md-6 col-12 pr-md-1">
+                            <div class="form-group">
+                                <label for="category">Size</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="sizeTxt" value="{{ variant_details.size.size }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12 pl-md-1">
+                            <div class="form-group">
+                                <label for="category">Color</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="colorTxt" value="{{ variant_details.color.color }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Sub section end-->
+
+                    <!--Sub section-->
+                    <div class="row">
+                        <div class="col-md-6 col-12 pr-md-1">
+                            <div class="form-group">
+                                <label for="category">Purchase price</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="purchasePriceTxt"
+                                       value="{{ variant_details.bag_purchase_price|floatformat:2 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12 pl-md-1">
+                            <div class="form-group">
+                                <label for="category">Marketing cost</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="marketingCostTxt" value="{{ variant_details.marketing_cost|floatformat:2 }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Sub section end-->
+
+                    <!--Sub section-->
+                    <div class="row">
+                        <div class="col-md-6 col-12 pr-md-1">
+                            <div class="form-group">
+                                <label for="category">Transport Cost</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="transportCostTxt"
+                                       value="{{ variant_details.transport_cost|floatformat:2 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12 pl-md-1">
+                            <div class="form-group">
+                                <label for="category">Printing cost</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="printingCostTxt" value="{{ variant_details.printing_cost|floatformat:2 }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Sub section end-->
+
+                    <!--Sub section-->
+                    <div class="row">
+                        <div class="col-md-6 col-12 pr-md-1">
+                            <div class="form-group">
+                                <label for="category">Vat</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="vatTxt"
+                                       value="{{ variant_details.vat|floatformat:2 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12 pl-md-1">
+                            <div class="form-group">
+                                <label for="category">Profit</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="profitTxt" value="{{ variant_details.profit|floatformat:2 }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Sub section end-->
+
+                    <!--Sub section-->
+                    <div class="row">
+                        <div class="col-md-6 col-12 pr-md-1">
+                            <div class="form-group">
+                                <label for="category">Discount(%)</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="discountText"
+                                       value="{{ variant_details.discount_percent }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12 pl-md-1">
+                            <div class="form-group">
+                                <label for="category">Min purchase for discount</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="minPurchaseTxt" value="{{ variant_details.discount_min_purchase }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Sub section end-->
+
+                    <!--Sub section-->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="category">Price</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="priceTxt"
+                                       value="{{ variant_details.price|floatformat:2 }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Sub section end-->
+
+                    <!--Sub section-->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="category">Total Stock</label>
+                                <input type="text" disabled class="form-control input-text"
+                                       id="stockTotalTxt"
+                                       value="{{ variant_details.stock_total }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Sub section end-->
+                </div>
+            </div>
+            <!--Variant Info end -->
+
+            {% if perms.view_suppliertransaction %}
+                <!--Supplier history-->
+                <div class="card card-user">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-12 text-center text-md-left">
+                                <h5 class="card-title">Supplying History</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row pt-2">
+                            <div class="col-12">
+                                <div class="table-responsive table_outside_border">
+                                    <table class="table table-hover" id="product_list">
+                                        <thead class="text-primary">
+                                        <th>Date</th>
+                                        <th>Supplier Name</th>
+                                        <th>Supplier Phone</th>
+                                        <th>Supplier Address</th>
+                                        <th>Total Supplied</th>
+                                        <th class="text-right">Purchase price</th>
+                                        <th class="text-right">Total purchase price</th>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in variant_details.supplier_list %}
+                                            <tr>
+                                                <td>{{ item.date|date:'d/m/Y h:i A' }}</td>
+                                                <td>{{ item.supplier.name }}</td>
+                                                <td>{{ item.supplier.mobile_no }}</td>
+                                                <td>{{ item.supplier.address }}</td>
+                                                <td>{{ item.total_supplied }}</td>
+                                                <td class="text-right">{{ item.per_product_purchase_price|floatformat:2 }}</td>
+                                                <td class="text-right">{{ item.total_purchase_price|floatformat:2 }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Supplier history end-->
+            {% endif %}
+        </div>
+    </div>
+    {% block add_new_js %}
+        <script>
+            /*-------------*/
+            {% if perms.product.change_product or perms.product.change_productvariant %}
+                function showSpinner() {
+                    $('#spinner').removeClass('display-none');
+                    $('#save_btn_txt').addClass('display-none');
+                }
+
+                function hideSpinner() {
+                    $('#spinner').addClass('display-none');
+                    $('#save_btn_txt').removeClass('display-none');
+                }
+
+                /*---------*/
+                function initErrorText() {
+                    $('#product_name_error_text').text('');
+                    $('input[name="product_name"]').removeClass('error_border');
+                    $('#errorBlock').html('<hr>');
+                    $('#errorBlock').addClass('display-none');
+                    $('#newStockErrorBlock').html('<hr>');
+                    $('#newStockErrorBlock').addClass('display-none');
+                }
+            {% endif %}
+
+            {% if perms.product.change_product %}
+                /*-----------------Product edit and error function----------*/
+                function productEditSuccess(data, textStatus, jqXHR) {
+                    hideSpinner();
+                    initErrorText();
+                    showToast('Product has been updated', 'success');
+                    $('#isProductEdited').val(0)
+                    window.productName = $('input[name="product_name"]').val();
+                    window.productDescription = $('textarea[name="product_description"]').val();
+                    $('#productNameTxt').val(window.productName);
+                    $('#productDescriptionTxt').val(window.productDescription)
+                    $('#productEditModal').modal('hide');
+                }
+
+                function productEditError(data, textStatus, jqXHR) {
+                    hideSpinner();
+                    $('#isProductEdited').val(0);
+                    initErrorText();
+                    var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                    if ('permission_denied' in errors) {
+                        showToast(errors.permission_denied, 'error');
+                    } else {
+                        showToast('Error occurred while updating product', 'error');
+                    }
+                    if (errors.product_name) {
+                        $('#product_name_error_text').text(errors.product_name[0]);
+                        $('input[name="product_name"]').addClass('error_border');
+                    }
+                }
+            {% endif %}
+            {% if perms.product.change_productvariant %}
+                /*-----------------Product edit and error function End----------*/
+                function variantEditSuccess(data, textStatus, jqXHR) {
+                    hideSpinner();
+                    initErrorText();
+                    showToast('Variant has been updated', 'success');
+                    window.gsm = $('select[name="gsm"]').val();
+                    window.category = $('select[name="category"]').val();
+                    window.size = $('select[name="size"]').val();
+                    window.color = $('select[name="color"]').val();
+                    window.purchasePrice = $('input[name="bag_purchase_price"]').val();
+                    window.marketingCost = $('input[name="marketing_cost"]').val();
+                    window.transportCost = $('input[name="transport_cost"]').val();
+                    window.printingCost = $('input[name="printing_cost"]').val();
+                    window.vat = $('input[name="vat"]').val();
+                    window.profit = $('input[name="profit"]').val();
+                    window.stockTotal = $('input[name="stock_total"]').val();
+                    window.discountPercent = $('input[name="discount_percent"]').val();
+                    window.discountMinPurchase = $('input[name="discount_min_purchase"]').val();
+
+                    $('#gsmTxt').val(window.gsm);
+                    $('#categoryTxt').val($('select[name="category"] option:selected').text());
+                    $('#sizeTxt').val($('select[name="size"] option:selected').text());
+                    $('#colorTxt').val($('select[name="color"] option:selected').text());
+                    $('#purchasePriceTxt').val(parseFloat(window.purchasePrice).toFixed(3));
+                    $('#marketingCostTxt').val(parseFloat(window.marketingCost).toFixed(3));
+                    $('#printingCostTxt').val(parseFloat(window.printingCost).toFixed(3));
+                    $('#transportCostTxt').val(parseFloat(window.transportCost).toFixed(3));
+                    $('#vatTxt').val(parseFloat(window.vat).toFixed(3));
+                    $('#profitTxt').val(parseFloat(window.profit).toFixed(3));
+                    $('#stockTotalTxt').val(window.stockTotal);
+                    $('#discountText').val(window.discountPercent);
+                    $('#minPurchaseTxt').val(window.discountMinPurchase);
+                    $('#variantEditModal').modal('hide');
+                }
+
+                function variantEditError(data, textStatus, jqXHR) {
+                    hideSpinner();
+                    $('#isVariantEdited').val(0);
+                    initErrorText();
+                    $('#errorBlock').removeClass('display-none');
+                    var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                    if ('permission_denied' in errors) {
+                        showToast(errors.permission_denied, 'error');
+                    } else {
+                        showToast('Error occurred while updating variant', 'error');
+                    }
+                    if (errors.__all__) {
+                        for (item of errors.__all__) {
+                            $('#errorBlock').prepend('<p class="text-center" style="color: red">' + item + '</p>');
+                        }
+
+                    }
+                }
+            {% endif %}
+            {% if perms.product.change_variant %}
+                function newStockSuccess(data, textStatus, jqXHR) {
+                    hideSpinner();
+                    initErrorText();
+                    showToast('Stock has been updated', 'success');
+                    window.purchasePrice = data.per_product_purchase_price;
+                    $('#purchasePriceTxt').val((data.per_product_purchase_price).toFixed(2));
+                    html = `
+                  <tr>
+                        <td>${data.date}</td>
+                        <td>${data.name}</td>
+                        <td>${data.mobile_no}</td>
+                        <td>${data.address}</td>
+                        <td>${data.total_supplied}</td>
+                        <td class="text-right">${(data.per_product_purchase_price).toFixed(2)}</td>
+                        <td class="text-right">${(parseFloat(data.per_product_purchase_price) * parseFloat(data.total_supplied)).toFixed(2)}</td>
+                   </tr>`;
+                    $('#product_list').prepend(html);
+                    $('#newStockModal').modal('hide');
+                }
+
+                function newStockError(data, textStatus, jqXHR) {
+                    hideSpinner();
+                    initErrorText();
+                    $('#newStockErrorBlock').removeClass('display-none');
+                    var errors = data.responseJSON ? data.responseJSON : [{'error': ''}, {'error2': ''}];
+                    if ('permission_denied' in errors) {
+                        showToast(errors.permission_denied, 'error');
+                    } else {
+                        showToast('Error occurred while adding newstock', 'error');
+                    }
+
+                    if (__all__ in errors && errors.__all__) {
+                        for (item of errors.__all__) {
+                            $('#newStockErrorBlock').prepend('<p class="text-center" style="color: red">' + item + '</p>');
+                        }
+
+                    }
+                }
+            {% endif %}
+            function ajaxRequest(data, functionName) {
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: data,
+                    success: function (data, textStatus, jqXHR) {
+                        window[functionName + 'Success'](data, textStatus, jqXHR)
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                        window[functionName + 'Error'](data, textStatus, jqXHR)
+                    }
+                });
+            }
+
+            /*----------------------------------------------------*/
+            $(document).ready(function () {
+                initDatatable();
+                preventAutoFormSubmission();
+                {% if perms.product.change_product %}
+                    window.productName = $(`{{ product_form.product_name }}`).val();
+                    window.productDescription = $(`{{ product_form.product_description }}`).val();
+                    /*---------Product edit form action--------------*/
+                    $('#product_edit_btn').on('click', function () {
+                        $('input[name="product_name"]').val(window.productName);
+                        $('textarea[name="product_description"]').val(window.productDescription);
+                        initErrorText();
+                    });
+
+                    $("#productForm").bind("submit", function (e) {
+                        e.preventDefault();
+                        if ($('input[name="product_name"]').val() == window.productName) {
+                            $('#isProductEdited').val(1)
+                        }
+                        var data = $(this).serialize() + '&id={{ variant_details.product.id }}';
+                        showSpinner();
+                        ajaxRequest(data, 'productEdit')
+
+                    });
+                    /*---------Product edit form action End--------------*/
+                {% endif %}
+                {% if perms.product.change_productvariant %}
+                    window.color = $(`{{ variant_form.color }}`).val();
+                    window.category = $(`{{ variant_form.category }}`).val();
+                    window.size = $(`{{ variant_form.size }}`).val();
+                    window.gsm = $(`{{ variant_form.gsm }}`).val();
+                    window.purchasePrice = $(`{{ variant_form.bag_purchase_price }}`).val();
+                    window.marketingCost = $(`{{ variant_form.marketing_cost }}`).val();
+                    window.transportCost = $(`{{ variant_form.transport_cost }}`).val();
+                    window.printingCost = $(`{{ variant_form.printing_cost }}`).val();
+                    window.vat = $(`{{ variant_form.vat }}`).val();
+                    window.profit = $(`{{ variant_form.profit }}`).val();
+                    window.stockTotal = $(`{{ variant_form.stock_total }}`).val();
+                    window.discountPercent = $(`{{ variant_form.discount_percent }}`).val();
+                    window.discountMinPurchase = $(`{{ variant_form.discount_min_purchase }}`).val();
+                    $('#variantEditBtn').on('click', function () {
+                        $('select[name="gsm"]').val(window.gsm);
+                        $('select[name="category"]').val(window.category);
+                        $('select[name="size"]').val(window.size);
+                        $('select[name="color"]').val(window.color);
+                        $('input[name="bag_purchase_price"]').val(window.purchasePrice);
+                        $('input[name="marketing_cost"]').val(window.marketingCost);
+                        $('input[name="transport_cost"]').val(window.transportCost);
+                        $('input[name="printing_cost"]').val(window.printingCost);
+                        $('input[name="vat"]').val(window.vat);
+                        $('input[name="profit"]').val(window.profit);
+                        $('input[name="stock_total"]').val(window.stockTotal);
+                        $('input[name="discount_percent"]').val(window.discountPercent);
+                        $('input[name="discount_min_purchase"]').val(window.discountMinPurchase);
+                        initErrorText();
+                    });
+
+                    $("#variantForm").bind("submit", function (e) {
+                        e.preventDefault();
+                        if ($('select[name="gsm"]').val() == window.gsm && $('select[name="category"]').val() == window.category && $('select[name="size"]').val() == window.size && $('select[name="color"]').val() == window.color) {
+                            $('#isVariantEdited').val(1)
+                        }
+                        var data = $(this).serialize();
+                        showSpinner();
+                        ajaxRequest(data, 'variantEdit')
+
+                    });
+                    /*---------------*/
+                    $('#newStockbtn').on('click', function () {
+                        $('select[name="supplier"]').val('');
+                        $('input[name="new_stock"]').val('');
+                        initErrorText();
+                    });
+                    $("#newStockForm").bind("submit", function (e) {
+                        e.preventDefault();
+                        var data = $(this).serialize();
+                        showSpinner();
+                        ajaxRequest(data, 'newStock')
+                    });
+                {% endif %}
+            });
+
+        </script>
+    {% endblock %}
+{% endblock %}
+

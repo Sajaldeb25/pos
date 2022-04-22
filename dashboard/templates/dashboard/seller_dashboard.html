@@ -1,0 +1,315 @@
+{% extends "partial_view/main.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-6 col-12 col-xl-4">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-globe text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total Inventory</p>
+                                <p class="card-title">{{ seller_data.net_stock }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12 col-xl-4">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-cart-simple text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total Taken Order</p>
+                                <p class="card-title">{{ seller_data.total_taken_order }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12 col-xl-4">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-cart-simple text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total sold item</p>
+                                <p class="card-title">{{ seller_data.total_order_item }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12 col-xl-4">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-money-coins text-success"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total generated revenue</p>
+                                <p class="card-title">{{ seller_data.total_order_billed|floatformat:2 }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12 col-xl-4">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-money-coins text-success"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total collected cash</p>
+                                <p class="card-title">{{ seller_data.total_collected_cash|floatformat:2 }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12 col-xl-4">
+            <div class="card card-stats">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5 col-md-4">
+                            <div class="icon-big text-center icon-warning">
+                                <i class="nc-icon nc-money-coins text-success"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-md-8">
+                            <div class="numbers">
+                                <p class="card-category">Total due from order</p>
+                                <p class="card-title">{{ seller_data.total_due_from_order|floatformat:2 }}
+                                <p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer ">
+                    <hr>
+                    <div class="stats">
+                        <i class="fa fa-calendar-o"></i> Until Now
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-chart">
+                <div class="card-header text-center">
+                    <div class="row">
+                        <div class="col-12 col-md-10">
+                            <h5 class="card-title" id="currentMonthStcsLabel"></h5>
+                        </div>
+                        <div class="col-12 col-md-2 text-md-center">
+                            <button class="btn btn-primary dropdown-toggle" type="button"
+                                    id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Revenue
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+                                 style="border: 1px solid gray;">
+                                <a class="dropdown-item cursor-pointer" id="orderBtn">Order</a>
+                                <a class="dropdown-item cursor-pointer" id="itemsBtn">Items</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<p class="card-category"></p>-->
+                </div>
+                <hr/>
+                <div class="card-body">
+                    <canvas id="currentMonthChart" width="300" height="100"></canvas>
+                </div>
+                <div class="card-footer">
+                    <hr/>
+                    <div class="chart-legend">
+                        <i class="fa fa-circle text-warning"></i>Order
+                        <i class="fa fa-circle text-info"></i>Sold Item
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block add_new_js %}
+    <script>
+        var monthList = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        function initLineChart(canvas, chartData, chartOptions) {
+            return new Chart(canvas, {
+                type: 'line',
+                hover: true,
+                data: chartData,
+                options: chartOptions
+            });
+        }
+
+        function initCurrentMonthChart() {
+            var currentMonthStcsCanvas = document.getElementById("currentMonthChart");
+            var orders = [];
+            var items = [];
+            var today = new Date();
+            $('#currentMonthStcsLabel').text(`${monthList[today.getMonth()]}'${today.getFullYear()}`);
+            var currentDate = new Date();
+            var list = [];
+            for (let i = 1; i <= currentDate.getDate(); i++) {
+                list.push(`Day-${i}`);
+            }
+
+            {% for item in seller_data.performance %}
+                var total_order = '{{item.total_order}}';
+                var total_item = '{{item.total_item}}';
+                orders.push(total_order);
+                items.push(total_item);
+            {% endfor %}
+            var dataFirst = {
+                data: orders,
+                fill: false,
+                borderColor: '#fbc658',
+                backgroundColor: 'transparent',
+                pointBorderColor: '#fbc658',
+                pointRadius: 4,
+                pointHoverRadius: 4,
+                pointBorderWidth: 8,
+            };
+
+            var dataSecond = {
+                data: items,
+                fill: false,
+                borderColor: '#51CACF',
+                backgroundColor: 'transparent',
+                pointBorderColor: '#51CACF',
+                pointRadius: 4,
+                pointHoverRadius: 4,
+                pointBorderWidth: 8
+            };
+            var currentMonthStcData = {
+                labels: list,
+                datasets: [dataFirst]
+            };
+
+            var chartOptions = {
+                legend: {
+                    display: false,
+                    position: 'top'
+                },
+                tooltips: {
+                    callbacks: {
+                        afterBody: function (t, d) {
+                            var dropdownTxt = $('#dropdownMenuButton').text();
+                            if (dropdownTxt == 'Order') {
+                                return `Sold items: ${items[t[0].index]}`
+                            }
+                            return `Order: ${orders[t[0].index]}`;  // return a string that you wish to append
+                        }
+                    }
+                },
+            };
+
+
+            var lineChart = initLineChart(currentMonthStcsCanvas, currentMonthStcData, chartOptions);
+            $('#orderBtn').addClass('chart-dropdown-active');
+            $('#dropdownMenuButton').text('Order');
+            $('#itemsBtn').on('click', function () {
+                lineChart.destroy();
+                currentMonthStcData.datasets = [dataSecond];
+                lineChart = initLineChart(currentMonthStcsCanvas, currentMonthStcData, chartOptions);
+                $('#itemsBtn').addClass('chart-dropdown-active');
+                $('#orderBtn').removeClass('chart-dropdown-active');
+                $('#dropdownMenuButton').text('Sold Item');
+            });
+            $('#orderBtn').on('click', function () {
+                lineChart.destroy();
+                currentMonthStcData.datasets = [dataFirst];
+                lineChart = initLineChart(currentMonthStcsCanvas, currentMonthStcData, chartOptions);
+                $('#itemsBtn').removeClass('chart-dropdown-active');
+                $('#orderBtn').addClass('chart-dropdown-active');
+                $('#dropdownMenuButton').text('Order');
+            });
+        }
+
+        $(document).ready(function () {
+            initDatatable();
+            initCurrentMonthChart();
+            /*----------------------*/
+            {% if messages %}
+                {% for message in messages %}
+                    var tags = ``;
+                    {% if message.tags %}
+                        tags = `{{ message.tags }}`;
+                    {% endif %}
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                    var message = `{{ message }}`;
+                    showToast(message, tags)
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
+{% endblock %}
