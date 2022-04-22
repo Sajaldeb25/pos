@@ -11,11 +11,11 @@ It is a Inventory management system for Shop. The inventory management system is
 🔔 `Note`If you interested to run it from locally with database and .env properly configured
 >Example: \
 > createvirtualenv env \
-> env/Scripts/activate.bat
-> pip install -r requirements.txt
-> cd pos
-> python manage.py migrate
-> python manage.py runserver
+> env/Scripts/activate.bat \
+> pip install -r requirements.txt \
+> cd pos \
+> python manage.py migrate \
+> python manage.py runserver 
 > 
 >> 
  🤾‍♂ `Configure database with the settings:`
