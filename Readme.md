@@ -18,7 +18,7 @@ It is a Inventory management system for Shop. The inventory management system is
 > python manage.py runserver 
 > 
 >> 
- 🤾‍♂ `Configure database with the settings:`
+ 🤾‍♂ `Configure database with the settings:` \
 DB_HOST=localhost \
 DB_PORT=5432 \
 DB_USER=postgres \
